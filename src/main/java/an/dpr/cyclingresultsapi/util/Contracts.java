@@ -37,10 +37,16 @@ public interface Contracts {
     public static final String PAGE_ID_ONE_DAY = "19006";
     public static final String PAGE_ID_STAGE_RACE = "19004";
     
-    //stage url
+    //stage results url
     public static final String ALL_RESULTS = "&S00=1&S01=2&S02=3&PageNr0=-1";
     public static final String URL_STAGE_1="http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19006&CompetitionCodeInv=1&Phase2ID=0&Phase3ID=0&DerivedEventPhaseID=-1&Detail=1&Ranking=0"+ALL_RESULTS;
     public static final String URL_STAGE_EVENT_DATA="&SportID=SPORT_ID&CompetitionID=COMPETITION_ID&EditionID=EDITION_ID&SeasonID=SEASON_ID&EventID=EVENT_ID&GenderID=GENDER_ID&ClassID=CLASS_ID";
     public static final String URL_STAGE_DATA="&Phase1ID=PHASE1_ID";
+    
+    //stage events url
+    public static final String URL_STAGE_EVENTS_1 = "http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19004&Phase1ID=-1&Phase2ID=0&Phase3ID=0"
+    	+ "&CompetitionCodeInv=1&Detail=1&Ranking=0&All=0&TaalCode=2&StyleID=0&Cache=8";
+    public static final String URL_STAGE_EVENTS_DATA= "&SportID="+SPORT_ID+"&CompetitionID="+COMPETITION_ID+"&EditionID="+EDITION_ID+"&SeasonID="+SEASON_ID
+	    +"&ClassID="+CLASS_ID+"&GenderID="+GENDER_ID+"&EventID="+EVENT_ID+"&EventPhaseID="+EVENT_PHASE_ID;
 
 }

@@ -9,6 +9,8 @@
 	
 	<!-- Beans del modelo de datos	-->
 	<bean id="competitionDAO" class="an.dpr.cyclingresultsapi.dao.springdatajpa.CompetitionDAOSDJPA"/>
+	<bean id="resultRowDAO" class="an.dpr.cyclingresultsapi.dao.springdatajpa.ResultRowDAOSDJPA"/>
+	
 	
 	<!-- REST Services -->
 	 <jaxrs:server id="services" address="/">

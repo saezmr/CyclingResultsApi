@@ -8,36 +8,22 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Entity
 @Table
-@XmlRootElement(name = "event")
-@XmlAccessorType(XmlAccessType.FIELD)
-public class OneDayResult {
+public class ResultRow {
 
-    @XmlElement
     private String rank;
-    @XmlElement
+    private Long id;
     private String name;
-    @XmlElement
     private String nat;
-    @XmlElement
     private String team;
-    @XmlElement
     private String age;
-    @XmlElement
     private String result;
-    @XmlElement
     private String paR;
-    @XmlElement
     private String pcR;
     //only for persistence
-    private Competition event;
-    private Long id;
+    private Competition competition;
     
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -51,12 +37,12 @@ public class OneDayResult {
     }
     
     @ManyToOne(fetch=FetchType.EAGER)
-    public Competition getEvent(){
-	return event;
+    public Competition getCompetition(){
+	return competition;
     }
 
-    public void setEvent(Competition event){
-	this.event=event;
+    public void setCompetition(Competition competition){
+	this.competition=competition;
     }
 
     @Column
@@ -141,8 +127,8 @@ public class OneDayResult {
 	private String paR;
 	private String pcR;
 	
-	public OneDayResult build(){
-	    OneDayResult r = new OneDayResult();
+	public ResultRow build(){
+	    ResultRow r = new ResultRow();
 	    r.setAge(age);
 	    r.setName(name);
 	    r.setNat(nat);

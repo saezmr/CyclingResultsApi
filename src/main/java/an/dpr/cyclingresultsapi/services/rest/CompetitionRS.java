@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,7 +18,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -52,7 +58,7 @@ public class CompetitionRS {
 
     
     private static final Logger log = LoggerFactory.getLogger(CompetitionRS.class);
-    private static final String ALL_COMPS = "http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19004&TaalCode=2&StyleID=0&SportID=102&CompetitionID=-1&EditionID=-1&CompetitionID=-1&GenderID=1&ClassID=1&CompetitionPhaseID=0&Phase1ID=0&Phase2ID=0&CompetitionCodeInv=1&PhaseStatusCode=262280&DerivedCompetitionPhaseID=-1&SeasonID=488&StartDateSort=20150108&EndDateSort=20151225&Detail=1&DerivedCompetitionID=-1&S00=-3&S01=2&S02=1&PageNr0=-1&Cache=8";
+    private static final String ALL_COMPS = "http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19004&TaalCode=2&StyleID=0&SportID=102&CompetitionID=-1&EditionID=-1&EventID=-1&GenderID=1&ClassID=1&EventPhaseID=0&Phase1ID=0&Phase2ID=0&CompetitionCodeInv=1&PhaseStatusCode=262280&DerivedEventPhaseID=-1&SeasonID=488&StartDateSort=20150108&EndDateSort=20151225&Detail=1&DerivedCompetitionID=-1&S00=-3&S01=2&S02=1&PageNr0=-1&Cache=8";
     
     @Autowired
     private CompetitionDAO dao;
@@ -103,13 +109,13 @@ public class CompetitionRS {
 	StringBuilder ret = new StringBuilder();
 	Competition competition = dao.getCompetition(Long.parseLong(competitionId), (long)-1);
 	try {
-//	    HttpClient client = new DefaultHttpClient();
-//	    HttpGet get = new HttpGet(url de la stage race EVENTS);
-//	    HttpResponse response = client.execute(get);
-//	    InputStreamReader isr = new InputStreamReader(response.getEntity()
-//		    .getContent(), "cp1252");
-	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/stageRaceCompetitions.htm";
-	    FileReader isr = new FileReader(new File(file));
+	    HttpClient client = new DefaultHttpClient();
+	    HttpGet get = new HttpGet(getURLStageEvents(competition));
+	    HttpResponse response = client.execute(get);
+	    InputStreamReader isr = new InputStreamReader(response.getEntity()
+		    .getContent(), "cp1252");
+//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/stageRaceCompetitions.htm";
+//	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {
@@ -117,11 +123,30 @@ public class CompetitionRS {
 	    }
 	} catch (ClientProtocolException e) {
 	    log.error("error leyendo info meteo", e);
+	} catch (URISyntaxException e) {
+	    log.error("error leyendo info meteo", e);
 	} catch (IOException e) {
 	    log.error("error leyendo info meteo", e);
 	}
 	log.info(ret.toString());
 	return tratarXmlStageRaceCompetitions(ret.toString(), competition);
+    }
+
+    private URI getURLStageEvents(Competition competition) throws URISyntaxException {
+	StringBuilder sb = new StringBuilder();
+	sb.append(Contracts.URL_STAGE_EVENTS_1);
+	sb.append(Contracts.URL_STAGE_EVENT_DATA
+		.replace(Contracts.SPORT_ID,competition.getSportID().toString())
+		.replace(Contracts.COMPETITION_ID,competition.getCompetitionID().toString())
+		.replace(Contracts.EDITION_ID,competition.getEditionID().toString())
+		.replace(Contracts.SEASON_ID,competition.getSeasonID().toString())
+		.replace(Contracts.CLASS_ID,competition.getClassID().toString())
+		.replace(Contracts.GENDER_ID,competition.getGenderID().toString())
+		.replace(Contracts.EVENT_ID,competition.getEventID().toString())
+		.replace(Contracts.EVENT_PHASE_ID,competition.getEventPhaseID().toString())
+		);
+	
+	return new URI(sb.toString());
     }
 
     private List<Competition> tratarXmlStageRaceCompetitions(String html, Competition competition) {
@@ -163,7 +188,6 @@ public class CompetitionRS {
     private String getURLStageResults(Competition comp){
 	StringBuilder sb = new StringBuilder();
 	sb.append(Contracts.URL_STAGE_1)
-	//&SportID=SPORT_ID&CompetitionID=COMPETITION_ID&EditionID=EDITION_ID&SeasonID=SEASON_ID&EventID=EVENT_ID&GenderID=GENDER_ID&ClassID=CLASS_ID"
 	.append(Contracts.URL_STAGE_EVENT_DATA
 		.replace(Contracts.SPORT_ID, String.valueOf(comp.getSportID()))
 		.replace(Contracts.COMPETITION_ID, String.valueOf(comp.getCompetitionID()))
@@ -189,13 +213,13 @@ public class CompetitionRS {
     public List<Competition> getLastCompetitions() throws URISyntaxException {
 	StringBuilder ret = new StringBuilder();
 	try {
-//	    HttpClient client = new DefaultHttpClient();
-//	    HttpGet get = new HttpGet(ALL_EVENTS);
-//	    HttpResponse response = client.execute(get);
-//	    InputStreamReader isr = new InputStreamReader(response.getEntity()
-//		    .getContent(), "cp1252");
-	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResults.htm";
-	    FileReader isr = new FileReader(new File(file));
+	    HttpClient client = new DefaultHttpClient();
+	    HttpGet get = new HttpGet(ALL_COMPS);
+	    HttpResponse response = client.execute(get);
+	    InputStreamReader isr = new InputStreamReader(response.getEntity()
+		    .getContent(), "cp1252");
+//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResults.htm";
+//	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {
