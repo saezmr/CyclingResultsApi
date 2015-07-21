@@ -14,18 +14,16 @@
 	
 
 	<context:annotation-config />
-	<!-- For Spring Data JPA  
+	<!-- For Spring Data JPA -->
 	<import resource="classpath:repository-context.xml" />
-	 -->
 	<import resource="classpath:beans.xml" />
-	<!--  POSTGRES
+	<!--  POSTGRES -->
 	<bean id="springConfiguredDataSource" class="org.postgresql.ds.PGSimpleDataSource">
-		<property name="databaseName" value="cyclubinf" />
+		<property name="databaseName" value="cyclingresultsdb" />
 		<property name="serverName" value="localhost" />
 		<property name="user" value="postgres" />
 		<property name="password" value="postgres" />
 	</bean>
-	 -->
 	<!-- derby
 	<bean id="springConfiguredDataSource" class="org.apache.derby.jdbc.EmbeddedSimpleDataSource">
 		<property name="databaseName" value="/users/saez/workspace/andpr/Manteniket/cyclubinfdb" />

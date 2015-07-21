@@ -14,9 +14,14 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import an.dpr.cyclingresultsapi.exception.CyclingResultsException;
 
 public class DateUtil {
+    
+    private static final Logger log = LoggerFactory.getLogger(DateUtil.class);
     // DATE PATTERNS
     public static final String DDMMYYYY = "ddMMyyyy";
     public static final String DD_MM_YYYY_DOT = "dd.MM.yyyy";
@@ -388,5 +393,16 @@ public class DateUtil {
 	cal.add(Calendar.YEAR, 1);
 	cal.add(Calendar.SECOND, -1);
 	return cal.getTime();
+    }
+    
+
+    public static Date parseUCIDate(String date) {
+	SimpleDateFormat sdf = new SimpleDateFormat("ddMMMyyyy", new Locale("en_EN"));
+	try {
+	    return sdf.parse(date);
+	} catch (ParseException e) {
+	    log.error("Error parseando " + date, e);
+	    return null;
+	}
     }
 }

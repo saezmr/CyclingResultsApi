@@ -7,14 +7,13 @@
 		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd 
 		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
 	
-	<!-- Beans del modelo de datos 
-	<bean id="calendarEventDAO" class="an.dpr.cyclubinf.dao.springdatajpa.CalendarEventDAOSpringDataJPA"/>
-	-->
+	<!-- Beans del modelo de datos	-->
+	<bean id="competitionDAO" class="an.dpr.cyclingresultsapi.dao.springdatajpa.CompetitionDAOSDJPA"/>
 	
 	<!-- REST Services -->
 	 <jaxrs:server id="services" address="/">
         <jaxrs:serviceBeans>
-            <bean class="an.dpr.cyclingresultsapi.services.rest.EventsRS"/>
+            <bean class="an.dpr.cyclingresultsapi.services.rest.CompetitionRS"/>
             <bean class="an.dpr.cyclingresultsapi.services.rest.ResultsRS"/>
         </jaxrs:serviceBeans>
         <jaxrs:providers>
