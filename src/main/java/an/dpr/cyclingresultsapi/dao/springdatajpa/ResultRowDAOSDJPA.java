@@ -40,4 +40,12 @@ public class ResultRowDAOSDJPA extends BasicDAO implements ResultRowDAO {
 	return list.size()>0;
     }
 
+    @Override
+    public boolean resultRowExists(ResultRow rr) {
+	ResultRow result = repo.findByRankAndCompetition(rr.getRank(), rr.getCompetition());
+	return result != null;
+    }
+    
+    
+
 }

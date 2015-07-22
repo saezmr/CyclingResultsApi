@@ -14,4 +14,6 @@ public interface ResultRowDAO {
     List<ResultRow> getResults(Competition competition);
 
     boolean competitionResultsExists(Competition competition);
+    
+    boolean resultRowExists(ResultRow rr);
 }

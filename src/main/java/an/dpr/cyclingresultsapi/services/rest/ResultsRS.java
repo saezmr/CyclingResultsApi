@@ -1,8 +1,9 @@
 package an.dpr.cyclingresultsapi.services.rest;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,10 +13,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -56,8 +55,6 @@ public class ResultsRS {
     @Autowired
     private ResultRowDAO rDao;
 
-    private String phase1ID;
-
     private static final String ROAD_MEN_SPORT_ID = "102";
     private static final String ONE_DAY_RESULTS_URL = "http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19006&TaalCode=2&StyleID=0"
 	    + "&SportID="
@@ -83,7 +80,7 @@ public class ResultsRS {
 	Competition comp = dao.getCompetition(Long.parseLong(competitionID),(long)-1);
 	List<ResultRow> list = rDao.getResults(comp);
 	if (list == null || list.size() == 0){
-	    String url = getURLOneDayResults(comp.getCompetitionID().toString());
+	    String url = getURLOneDayResults(comp);
 	    list = readFromUCIWebResults(comp, url);
 	}
 	return list;
@@ -94,10 +91,11 @@ public class ResultsRS {
 	try {
 	    HttpClient client = new DefaultHttpClient();// TODO DEPRECATED!
 
-	    HttpGet get = new HttpGet(url);
-	    HttpResponse response = client.execute(get);
-	    InputStreamReader isr = new InputStreamReader(response.getEntity()
-		    .getContent(), "cp1252");
+//	    HttpGet get = new HttpGet(url);
+//	    HttpResponse response = client.execute(get);
+//	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");
+	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/OneDayResult.htm";
+	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {
@@ -134,7 +132,7 @@ public class ResultsRS {
 	    if (!row.attr("valign").equals("top")) {// los que no tienen
 						    // valing=top son headers
 		Elements rowItems = row.select("td.caption");
-		if (rowItems.get(3).text().equals("team")) {
+		if (rowItems.get(3).text().equals("Team")) {
 		    isTeamTimeTrial = false;
 		    break;
 		}
@@ -167,8 +165,8 @@ public class ResultsRS {
 		}
 
 		if (rowItems.size() > 6) {
-		    builder.setPaR(rowItems.get(idx++).text()).setPcR(
-			    rowItems.get(idx++).text());
+		    builder.setPaR(rowItems.get(idx++).text())
+		    	.setPcR(rowItems.get(idx++).text());
 		}
 
 		ResultRow odr = builder.build();
@@ -184,7 +182,7 @@ public class ResultsRS {
     }
 
     private void persistResultRow(ResultRow rr) {
-	if (rr!= null && !rDao.competitionResultsExists(rr.getCompetition())){
+	if (rr!= null && !rDao.resultRowExists(rr)){
 	    rDao.save(rr);
 	    log.debug("salvado con exito");
 	}
@@ -206,11 +204,9 @@ public class ResultsRS {
 	return list;
     }
     
-    private String getURLOneDayResults(String competitionID) {
-	Competition comp = dao.getCompetition(Long.parseLong(competitionID),
-		Long.parseLong(phase1ID));
+    private String getURLOneDayResults(Competition comp) {
 	String url = ONE_DAY_RESULTS_URL
-		.replace(Contracts.COMPETITION_ID, competitionID)
+		.replace(Contracts.COMPETITION_ID, comp.getCompetitionID().toString())
 		.replace(Contracts.EDITION_ID, comp.getEditionID().toString())
 		.replace(Contracts.EVENT_PHASE_ID,
 			comp.getEventPhaseID().toString());

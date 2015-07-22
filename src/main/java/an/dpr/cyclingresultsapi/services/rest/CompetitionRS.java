@@ -51,6 +51,10 @@ import an.dpr.cyclingresultsapi.util.Contracts;
  *         DerivedCompetitionID=-1&S00=-3&S01=2&S02=1&PageNr0=-1&Cache=8
  *         
  * Todo el calendario: http://www.uci.ch/road/calendar/
+ * TODO LIST:
+ * 	-find by gender (male, female)
+ * 	-find by class (elite, sub23..)
+ * 	-find by category (world, europe, asia ...) 
  */
 
 @Path("/competitions/")
