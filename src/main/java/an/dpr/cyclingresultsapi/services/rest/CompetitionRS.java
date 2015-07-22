@@ -66,7 +66,6 @@ public class CompetitionRS {
 
     
     private static final Logger log = LoggerFactory.getLogger(CompetitionRS.class);
-    private static final String ALL_COMPS = "http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19004&TaalCode=2&StyleID=0&SportID=102&CompetitionID=-1&EditionID=-1&EventID=-1&GenderID=1&ClassID=1&EventPhaseID=0&Phase1ID=0&Phase2ID=0&CompetitionCodeInv=1&PhaseStatusCode=262280&DerivedEventPhaseID=-1&SeasonID=488&StartDateSort=20150108&EndDateSort=20151225&Detail=1&DerivedCompetitionID=-1&S00=-3&S01=2&S02=1&PageNr0=-1&Cache=8";
     
     @Autowired
     private CompetitionDAO dao;
@@ -283,12 +282,28 @@ public class CompetitionRS {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/last/")
-    public List<Competition> getLastCompetitions() throws URISyntaxException {
+    @Path("/loadCompetitions/")
+    public void getLastCompetitions() throws URISyntaxException {
+	//load year competitions
+        //Men Elite GenderID=1&ClassID=1
+	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.ELITE_CLASS_ID);
+	log.debug("competiciones masculinas elite cargadas con exito");
+	loadYearCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.ELITE_CLASS_ID);
+	log.debug("competiciones femeninas elite cargadas con exito");
+	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.UNDER23_CLASS_ID);
+	log.debug("competiciones masculinas sub23 cargadas con exito");
+	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID);
+	log.debug("competiciones masculinas junior cargadas con exito");
+	loadYearCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID);
+	log.debug("competiciones femeninas junior cargadas con exito");
+
+    }
+    
+    private void loadYearCompetitions(String genderID, String classID) {
 	StringBuilder ret = new StringBuilder();
 	try {
 //	    HttpClient client = new DefaultHttpClient();
-//	    HttpGet get = new HttpGet(ALL_COMPS);
+//	    HttpGet get = new HttpGet(getURLCompetitions(genderID, classID));
 //	    HttpResponse response = client.execute(get);
 //	    InputStreamReader isr = new InputStreamReader(response.getEntity()
 //		    .getContent(), "cp1252");
@@ -305,8 +320,15 @@ public class CompetitionRS {
 	    log.error("error leyendo info ", e);
 	}
 	log.info(ret.toString());
-	return tratarXmlCompetitions(ret.toString());
+	tratarXmlCompetitions(ret.toString());
     }
+    
+    private String getURLCompetitions(String genderID, String classID) {
+	return Contracts.ALL_RESULTS
+		.replace(Contracts.GENDER_ID_KEY, genderID)
+		.replace(Contracts.CLASS_ID_KEY, classID);
+    }
+
 
     private List<Competition> tratarXmlCompetitions(String html) {
 	Document doc = Jsoup.parse(html);
