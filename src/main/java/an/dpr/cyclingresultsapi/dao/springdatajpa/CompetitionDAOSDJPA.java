@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.dao.BasicDAO;
 import an.dpr.cyclingresultsapi.dao.CompetitionDAO;
 import an.dpr.cyclingresultsapi.domain.Competition;
@@ -69,6 +70,28 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
     public List<Competition> getYearByClass(Integer year) {
 	// TODO Auto-generated method stub
 	throw new RuntimeException("Por implementar");
+    }
+
+    @Override
+    public List<Competition> getCompetitions(Date time, Long genderID, Long classID, CompetitionClass cc) {
+	if (CompetitionClass.ALL.equals(cc)){
+	    log.debug("todos los tipso de competi");
+	    return repo.findByInitDateGreaterThanAndGenderIDAndClassID(time, genderID, classID);
+	} else {
+	    log.debug("competis tipo "+cc);
+	    return repo.findByInitDateGreaterThanAndGenderIDAndClassIDAndCompetitionClass(time, genderID, classID, cc);
+	}
+    }
+
+    @Override
+    public List<Competition> getCompetitions(Date init, Date fin, Long genderID, Long classID, CompetitionClass cc) {
+	if (CompetitionClass.ALL.equals(cc)){
+	    log.debug("todos los tipso de competi");
+	    return repo.findByInitDateBetweenAndGenderIDAndClassID(init, fin, genderID, classID);
+	} else {
+	    log.debug("competis tipo "+cc);
+	    return repo.findByInitDateBetweenAndGenderIDAndClassIDAndCompetitionClass(init, fin, genderID, classID, cc);
+	}
     }
 
 }

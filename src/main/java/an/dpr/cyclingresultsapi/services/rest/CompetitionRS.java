@@ -31,9 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.dao.CompetitionDAO;
 import an.dpr.cyclingresultsapi.domain.Competition;
+import an.dpr.cyclingresultsapi.exception.CyclingResultsException;
 import an.dpr.cyclingresultsapi.util.Contracts;
+import an.dpr.cyclingresultsapi.util.DateUtil;
 
 /**
  * REST service for cycling competitions
@@ -54,6 +57,7 @@ import an.dpr.cyclingresultsapi.util.Contracts;
  * TODO LIST:
  * 	-find by gender (male, female)
  * 	-find by class (elite, sub23..)
+ * 	-find by competitionClass (WT, hc1, 1.1...)
  * 	-find by category (world, europe, asia ...) 
  */
 
@@ -69,7 +73,74 @@ public class CompetitionRS {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    // @Produces(MediaType.APPLICATION_XML)
+    @Path("/query/{initDate},{finDate},{genderID},{classID},{competitionClass}")
+    public List<Competition> getCompetitions(
+	    @PathParam("initDate") String initDate,
+	    @PathParam("finDate") String finDate,
+	    @PathParam("genderID") String genderID,
+	    @PathParam("classID") String classID,
+	    @PathParam("competitionClass") String competitionClass) {
+	List<Competition> list = null;
+	Date id = getDate(initDate, false);
+	Date fd = getDate(finDate, true);
+	if (fd == null){
+	    list = dao.getCompetitions(id, getGenderID(genderID), getClassID(classID), getCompetitionClass(competitionClass));
+	} else {
+	    list = dao.getCompetitions(id, fd, getGenderID(genderID), getClassID(classID), getCompetitionClass(competitionClass));
+	}
+	return list;
+    }
+    
+    private CompetitionClass getCompetitionClass(String competitionClass) {
+	CompetitionClass ret = CompetitionClass.get(competitionClass);
+	if (ret == null){
+	    ret = CompetitionClass.ALL;
+	}
+	return ret;
+    }
+
+    private Long getClassID(String classID) {
+	try{
+	    return Long.parseLong(classID);
+	} catch(NumberFormatException e){
+	    return Contracts.DEFAULT_CLASS_ID;
+	}
+    }
+
+    private Long getGenderID(String genderID) {
+	try{
+	    return Long.parseLong(genderID);
+	} catch(NumberFormatException e){
+	    return Contracts.DEFAULT_GENDER_ID;
+	}
+    }
+
+    private Date getDate(String cadena, boolean nullable) {
+	Date ret = null;
+	if (cadena == null || cadena.isEmpty()) {
+	    //fecha por defecto 1/1 del año actual
+	    if (!nullable){
+		Calendar cal = Calendar.getInstance();
+		int year = cal.get(Calendar.YEAR);
+		Date date = new Date(0);
+		cal.setTime(date);
+		cal.set(Calendar.HOUR, 0);
+		cal.set(Calendar.YEAR, year);
+		ret=cal.getTime();
+	    }
+	    
+	} else {
+	    try {
+		ret = DateUtil.parse(cadena, DateUtil.DDMMYYYY);
+	    } catch (CyclingResultsException e) {
+		log.error("",e);
+	    }
+	}
+	return ret;
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/next/")
     public List<Competition> getNextCompetitions() {
 	return dao.getYearCompetitions(2015);
@@ -77,7 +148,6 @@ public class CompetitionRS {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    // @Produces(MediaType.APPLICATION_XML)
     @Path("/year/{year}")
     public List<Competition> getYearCompetitions(@PathParam("year") String year) {
 	return dao.getYearCompetitions(Integer.parseInt(year));
@@ -126,11 +196,11 @@ public class CompetitionRS {
 		ret.append(line);
 	    }
 	} catch (ClientProtocolException e) {
-	    log.error("error leyendo info meteo", e);
+	    log.error("error leyendo info ", e);
 	} catch (URISyntaxException e) {
-	    log.error("error leyendo info meteo", e);
+	    log.error("error leyendo info ", e);
 	} catch (IOException e) {
-	    log.error("error leyendo info meteo", e);
+	    log.error("error leyendo info ", e);
 	}
 	log.info(ret.toString());
 	return tratarXmlStageRaceCompetitions(ret.toString(), competition);
@@ -217,22 +287,22 @@ public class CompetitionRS {
     public List<Competition> getLastCompetitions() throws URISyntaxException {
 	StringBuilder ret = new StringBuilder();
 	try {
-	    HttpClient client = new DefaultHttpClient();
-	    HttpGet get = new HttpGet(ALL_COMPS);
-	    HttpResponse response = client.execute(get);
-	    InputStreamReader isr = new InputStreamReader(response.getEntity()
-		    .getContent(), "cp1252");
-//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResults.htm";
-//	    FileReader isr = new FileReader(new File(file));
+//	    HttpClient client = new DefaultHttpClient();
+//	    HttpGet get = new HttpGet(ALL_COMPS);
+//	    HttpResponse response = client.execute(get);
+//	    InputStreamReader isr = new InputStreamReader(response.getEntity()
+//		    .getContent(), "cp1252");
+	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResults.htm";
+	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {
 		ret.append(line);
 	    }
 	} catch (ClientProtocolException e) {
-	    log.error("error leyendo info meteo", e);
+	    log.error("error leyendo info ", e);
 	} catch (IOException e) {
-	    log.error("error leyendo info meteo", e);
+	    log.error("error leyendo info ", e);
 	}
 	log.info(ret.toString());
 	return tratarXmlCompetitions(ret.toString());
@@ -270,8 +340,8 @@ public class CompetitionRS {
 				rowItems.get(0).text().replace("\u00a0", "")
 					.trim())
 			.setName(rowItems.get(1).text())
-			.setNationality(rowItems.get(2).text())
-			.setCompetitionClass(rowItems.get(3).text()).build();
+			.setNationality(rowItems.get(2).text())	
+			.setCompetitionClass(CompetitionClass.get(rowItems.get(3).text())).build();
 		competition.calculateCompetitionType();
 		log.debug(competition.toString());
 		persistCompetition(competition);

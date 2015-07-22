@@ -2,6 +2,9 @@ package an.dpr.cyclingresultsapi.util;
 
 
 public interface Contracts {
+    //VALORE SPOR DEFECTO
+    public static final Long DEFAULT_CLASS_ID = (long) 1;
+    public static final Long DEFAULT_GENDER_ID = (long) 1;
 
     //KEYS DE LA UCI
     public static final String SEASON_ID_KEY="SeasonID";

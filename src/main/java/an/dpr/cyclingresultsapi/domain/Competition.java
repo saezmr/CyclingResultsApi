@@ -14,6 +14,7 @@ import javax.persistence.TemporalType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.bean.CompetitionType;
 import an.dpr.cyclingresultsapi.util.Contracts;
 import an.dpr.cyclingresultsapi.util.DateUtil;
@@ -61,7 +62,7 @@ public class Competition {
     private Date initDate;
     private Date finishDate;
     private String nationality;// TODO ENUM!!
-    private String competitionClass;// TODO ENUM!!
+    private CompetitionClass competitionClass;// TODO ENUM!!
     private String category;// TODO ENUM!!
     private String classificationName;//general, puntos, etapa 3...
     private CompetitionType competitionType;
@@ -123,11 +124,11 @@ public class Competition {
     }
 
     @Column
-    public String getCompetitionClass() {
+    public CompetitionClass getCompetitionClass() {
 	return competitionClass;
     }
 
-    public void setCompetitionClass(String competitionClass) {
+    public void setCompetitionClass(CompetitionClass competitionClass) {
 	this.competitionClass = competitionClass;
     }
 
@@ -339,7 +340,7 @@ public class Competition {
 	private String name;
 	private String dates;
 	private String nationality;
-	private String competitionClass;
+	private CompetitionClass competitionClass;
 	private String category;
 	private Long genderID;// 1 men 2 women
 	private Long classID;// elite 2 junior 101 sub23
@@ -450,7 +451,7 @@ public class Competition {
 	    return this;
 	}
 
-	public Builder setCompetitionClass(String competitionClass) {
+	public Builder setCompetitionClass(CompetitionClass competitionClass) {
 	    this.competitionClass = competitionClass;
 	    return this;
 	}

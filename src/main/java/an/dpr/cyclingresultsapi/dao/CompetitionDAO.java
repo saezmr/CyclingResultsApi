@@ -3,9 +3,14 @@ package an.dpr.cyclingresultsapi.dao;
 import java.util.Date;
 import java.util.List;
 
+import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.domain.Competition;
 
 public interface CompetitionDAO {
+
+    List<Competition> getCompetitions(Date init, Long genderID, Long classID, CompetitionClass cc);
+
+    List<Competition> getCompetitions(Date init, Date fin, Long genderID, Long classID, CompetitionClass cc);
 
     List<Competition> getCompetitionsBetweenDates(Date init, Date fin);
     
