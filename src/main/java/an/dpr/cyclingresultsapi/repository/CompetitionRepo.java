@@ -31,8 +31,10 @@ public interface CompetitionRepo  extends CrudRepository<Competition, Long> {
     
     List<Competition> findByInitDateBetween(Date init, Date fin);
 
-    Competition findByCompetitionIDAndPhase1ID(Long competitionID, Long phase1ID);
-
     List<Competition> findByCompetitionID(Long competitionID);
+
+    Competition findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndPhase1ID(
+	    Long competitionId, Long eventID, Long genderID, Long classID,
+	    Long phase1id);
     
 }

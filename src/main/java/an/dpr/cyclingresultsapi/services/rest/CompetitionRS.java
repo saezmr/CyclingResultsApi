@@ -1,8 +1,6 @@
 package an.dpr.cyclingresultsapi.services.rest;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -175,12 +173,16 @@ public class CompetitionRS {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/stageRaceCompetitions/{competitionId}")
+    @Path("/stageRaceCompetitions/{competitionID},{eventID},{genderID},{classID}")
     public List<Competition> getStageRaceCompetitions(
-	    @PathParam("competitionId") String competitionId
+	    @PathParam("competitionID") String competitionID,
+	    @PathParam("eventID") String eventID,
+	    @PathParam("genderID") String genderID,
+	    @PathParam("classID") String classID
 	    ) {
 	StringBuilder ret = new StringBuilder();
-	Competition competition = dao.getCompetition(Long.parseLong(competitionId), (long)-1);
+	Competition competition = dao.getCompetition(Long.parseLong(competitionID),
+		Long.parseLong(eventID),Long.parseLong(genderID), Long.parseLong(classID), (long)-1);
 	try {
 	    HttpClient client = new DefaultHttpClient();
 	    HttpGet get = new HttpGet(getURLStageEvents(competition));
@@ -283,7 +285,7 @@ public class CompetitionRS {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/loadCompetitions/")
-    public boolean getLastCompetitions() throws URISyntaxException {
+    public Boolean getLastCompetitions() throws URISyntaxException {
 	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.ELITE_CLASS_ID);
 	log.debug("competiciones masculinas elite cargadas con exito");
 	loadYearCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.ELITE_CLASS_ID);
@@ -294,19 +296,19 @@ public class CompetitionRS {
 	log.debug("competiciones masculinas junior cargadas con exito");
 	loadYearCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID);
 	log.debug("competiciones femeninas junior cargadas con exito");
-	return true;
+	return Boolean.TRUE;
     }
     
     private void loadYearCompetitions(String genderID, String classID) {
 	StringBuilder ret = new StringBuilder();
 	try {
-//	    HttpClient client = new DefaultHttpClient();
-//	    HttpGet get = new HttpGet(getURLCompetitions(genderID, classID));
-//	    HttpResponse response = client.execute(get);
-//	    InputStreamReader isr = new InputStreamReader(response.getEntity()
-//		    .getContent(), "cp1252");
-	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResults.htm";
-	    FileReader isr = new FileReader(new File(file));
+	    HttpClient client = new DefaultHttpClient();
+	    HttpGet get = new HttpGet(getURLCompetitions(genderID, classID));
+	    HttpResponse response = client.execute(get);
+	    InputStreamReader isr = new InputStreamReader(response.getEntity()
+		    .getContent(), "cp1252");
+//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResults.htm";
+//	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {
@@ -323,9 +325,11 @@ public class CompetitionRS {
     }
     
     private String getURLCompetitions(String genderID, String classID) {
-	return Contracts.ALL_RESULTS
-		.replace(Contracts.GENDER_ID_KEY, genderID)
-		.replace(Contracts.CLASS_ID_KEY, classID);
+	String url = Contracts.ALL_COMPS
+		.replace(Contracts.GENDER_ID, genderID)
+		.replace(Contracts.CLASS_ID, classID);
+	log.debug(url);
+	return url;
     }
 
 
@@ -373,9 +377,15 @@ public class CompetitionRS {
     }
 
     private void persistCompetition(Competition comp) {
-	if (comp!= null && comp.getCompetitionID() != null 
-		&& dao.getCompetition(comp.getCompetitionID(), comp.getPhase1ID())==null){
-	    dao.save(comp);
+	if (comp!= null && comp.getCompetitionID() != null ){
+	    Competition saveComp= dao.getCompetition(comp.getCompetitionID(), comp.getEventID(), 
+		    comp.getGenderID(), comp.getClassID(), comp.getPhase1ID());
+	    if (saveComp == null){
+		dao.save(comp);
+	    } else if (!saveComp.getName().equals(comp.getName())){
+		saveComp.setName(comp.getName());
+		dao.save(saveComp);
+	    }
 	}
     }
 

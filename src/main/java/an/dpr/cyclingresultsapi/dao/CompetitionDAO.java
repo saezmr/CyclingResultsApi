@@ -28,9 +28,10 @@ public interface CompetitionDAO {
      * En el caso de las carreras de un dia, devuelve el competitiono unico.
      * En el caso de las carreras por etapas, devuelve el elemento principal.
      * @param competitionId
+     * @param eventID ->si hay varios tipos. Por ej TT y ruta.
      * @return
      */
-    Competition getCompetition(Long competitionID, Long phase1ID);
+    Competition getCompetition(Long competitionID, Long eventID, Long genderID, Long classID, Long phase1ID);
     
     /**
      * Devuelve el listado de competitionos etapa y clasificacion general

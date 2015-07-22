@@ -1,9 +1,8 @@
 package an.dpr.cyclingresultsapi.services.rest;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +12,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -72,12 +73,19 @@ public class ResultsRS {
     /*
      * competitionId EditionID EventPhaseID PhaseClassificationID
      */
+    
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/oneDay/{competition_id}")
+    @Path("/oneDay/{competition_id},{eventID},{genderID}, {classID}")
     public List<ResultRow> getOneDayResult(
-	    @PathParam("competition_id") String competitionID) {
-	Competition comp = dao.getCompetition(Long.parseLong(competitionID),(long)-1);
+	    @PathParam("competition_id") String competitionID,
+	    @PathParam("eventID") String eventID,
+	    @PathParam("genderID") String genderID,
+	    @PathParam("classID") String classID
+	    ) {
+	Competition comp = dao.getCompetition(Long.parseLong(competitionID),
+		Long.parseLong(eventID),Long.parseLong(genderID), Long.parseLong(classID),(long)-1);
 	List<ResultRow> list = rDao.getResults(comp);
 	if (list == null || list.size() == 0){
 	    String url = getURLOneDayResults(comp);
@@ -91,11 +99,11 @@ public class ResultsRS {
 	try {
 	    HttpClient client = new DefaultHttpClient();// TODO DEPRECATED!
 
-//	    HttpGet get = new HttpGet(url);
-//	    HttpResponse response = client.execute(get);
-//	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");
-	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/OneDayResult.htm";
-	    FileReader isr = new FileReader(new File(file));
+	    HttpGet get = new HttpGet(url);
+	    HttpResponse response = client.execute(get);
+	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");
+//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/OneDayResult.htm";
+//	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {
@@ -187,14 +195,19 @@ public class ResultsRS {
 	    log.debug("salvado con exito");
 	}
     }
-
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/stage/{competitionId},{phase1Id}")
+    @Path("/stage/{competitionId},{eventID},{genderID}, {classID},{phase1Id}")
     public List<ResultRow> getStageResult(
 	    @PathParam("competitionId") String competitionID,
+	    @PathParam("eventID") String eventID,
+	    @PathParam("genderID") String genderID,
+	    @PathParam("classID") String classID,
 	    @PathParam("phase1Id") String phase1ID) {
 	Competition comp = dao.getCompetition(Long.parseLong(competitionID),
+		Long.parseLong(eventID),
+		Long.parseLong(genderID), Long.parseLong(classID),
 		Long.parseLong(phase1ID));
 	List<ResultRow> list = rDao.getResults(comp);
 	if (list == null || list.size() == 0){

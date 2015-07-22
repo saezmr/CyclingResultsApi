@@ -40,10 +40,10 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
     public Competition findById(Long id) {
 	return repo.findOne(id);
     }
-
+    
     @Override
-    public Competition getCompetition(Long competitionId, Long phase1ID) {
-	return repo.findByCompetitionIDAndPhase1ID(competitionId, phase1ID);
+    public Competition getCompetition(Long competitionId, Long eventID, Long genderID, Long classID, Long phase1ID) {
+	return repo.findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndPhase1ID(competitionId, eventID, genderID, classID, phase1ID);
     }
 
     @Override
