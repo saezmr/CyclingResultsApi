@@ -283,9 +283,7 @@ public class CompetitionRS {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/loadCompetitions/")
-    public void getLastCompetitions() throws URISyntaxException {
-	//load year competitions
-        //Men Elite GenderID=1&ClassID=1
+    public boolean getLastCompetitions() throws URISyntaxException {
 	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.ELITE_CLASS_ID);
 	log.debug("competiciones masculinas elite cargadas con exito");
 	loadYearCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.ELITE_CLASS_ID);
@@ -296,7 +294,7 @@ public class CompetitionRS {
 	log.debug("competiciones masculinas junior cargadas con exito");
 	loadYearCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID);
 	log.debug("competiciones femeninas junior cargadas con exito");
-
+	return true;
     }
     
     private void loadYearCompetitions(String genderID, String classID) {
@@ -319,8 +317,9 @@ public class CompetitionRS {
 	} catch (IOException e) {
 	    log.error("error leyendo info ", e);
 	}
-	log.info(ret.toString());
-	tratarXmlCompetitions(ret.toString());
+	//log.debug(ret.toString());
+	List<Competition> list = tratarXmlCompetitions(ret.toString());
+	log.debug(list.size()+" competitions load, genderID="+genderID+", classID="+classID);
     }
     
     private String getURLCompetitions(String genderID, String classID) {
