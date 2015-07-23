@@ -46,6 +46,8 @@ import an.dpr.cyclingresultsapi.util.Contracts;
  *         =1069239
  *         &Detail=1&Ranking=0&DerivedEventPhaseID=-1&S00=1&S01=2&S02=3&PageNr0
  *         =-1&Cache=8
+ *         
+ *   //TODO FALTARIAN LAS CLASIFICACIONES GENERALES "COMPLEMENTARIAS", MONTAÑA, PUNTOS...
  */
 @Path("results")
 public class ResultsRS {
