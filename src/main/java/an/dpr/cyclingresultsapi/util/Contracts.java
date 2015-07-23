@@ -10,6 +10,7 @@ public interface Contracts {
     public static final String ELITE_CLASS_ID="1";
     public static final String JUNIOR_CLASS_ID="2";
     public static final String UNDER23_CLASS_ID="101";
+    public static final Long PHASE_1_ID_GENERAL_CLASSIFICATIONS = (long)0;
     
     //KEYS DE LA UCI
     public static final String SEASON_ID_KEY="SeasonID";

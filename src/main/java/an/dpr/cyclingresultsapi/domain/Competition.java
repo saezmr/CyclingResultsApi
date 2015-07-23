@@ -338,6 +338,8 @@ public class Competition {
 	private Long phaseClassificationID;
 	private Long eventPhaseID;
 	private String name;
+	private Date initDate;
+	private Date finishDate;
 	private String dates;
 	private String nationality;
 	private CompetitionClass competitionClass;
@@ -364,7 +366,8 @@ public class Competition {
 	    comp.setEditionID(editionID);
 	    comp.setPhaseClassificationID(phaseClassificationID);
 	    comp.setName(name);
-	    comp.setDates(dates);
+	    if (dates != null)
+		comp.setDates(dates);
 	    comp.setNationality(nationality);
 	    comp.setCompetitionClass(competitionClass);
 	    comp.setCategory(category);
@@ -379,6 +382,10 @@ public class Competition {
 	    comp.setCompetitionID(competitionID);
 	    comp.setLeader(leader);
 	    comp.setWinner(winner);
+	    if (initDate != null)
+		comp.setInitDate(initDate);
+	    if (finishDate != null)
+		comp.setFinishDate(finishDate);
 
 	    return comp;
 	}
@@ -477,6 +484,16 @@ public class Competition {
 
 	public Builder setLeader(String leader) {
 	    this.leader = leader;
+	    return this;
+	}
+	
+	public Builder setInitDate(Date date){
+	    initDate = date;
+	    return this;
+	}
+
+	public Builder setFinishDate(Date date){
+	    finishDate = date;
 	    return this;
 	}
     }

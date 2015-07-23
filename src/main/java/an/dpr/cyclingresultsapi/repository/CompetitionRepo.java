@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
 import an.dpr.cyclingresultsapi.bean.CompetitionClass;
+import an.dpr.cyclingresultsapi.bean.CompetitionType;
 import an.dpr.cyclingresultsapi.domain.Competition;
 
 /**
@@ -36,5 +37,10 @@ public interface CompetitionRepo  extends CrudRepository<Competition, Long> {
     Competition findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndPhase1ID(
 	    Long competitionId, Long eventID, Long genderID, Long classID,
 	    Long phase1id);
+
+    List<Competition> findByInitDateBetweenAndCompetitionType(Date init, Date fin, CompetitionType type);
+
+    Competition findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndPhase1IDAndPhaseClassificationID(
+	    Long competitionId, Long eventID, Long genderID, Long classID, Long phase1id, Long phaseClassificationID);
     
 }

@@ -1,6 +1,8 @@
 package an.dpr.cyclingresultsapi.services.rest;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -30,6 +32,7 @@ import an.dpr.cyclingresultsapi.dao.ResultRowDAO;
 import an.dpr.cyclingresultsapi.domain.Competition;
 import an.dpr.cyclingresultsapi.domain.ResultRow;
 import an.dpr.cyclingresultsapi.util.Contracts;
+import an.dpr.cyclingresultsapi.util.Utils;
 
 /**
  * REST service for cycling results
@@ -91,12 +94,12 @@ public class ResultsRS {
 	List<ResultRow> list = rDao.getResults(comp);
 	if (list == null || list.size() == 0){
 	    String url = getURLOneDayResults(comp);
-	    list = readFromUCIWebResults(comp, url);
+	    list = readStageFromUCIWebResults(comp, url);
 	}
 	return list;
     }
     
-    private List<ResultRow> readFromUCIWebResults(Competition comp, String url){
+    private List<ResultRow> readStageFromUCIWebResults(Competition comp, String url){
 	StringBuilder ret = new StringBuilder();
 	try {
 	    HttpClient client = new DefaultHttpClient();// TODO DEPRECATED!
@@ -117,7 +120,7 @@ public class ResultsRS {
 	    log.error("error leyendo info", e);
 	}
 	log.info(ret.toString());
-	return tratarXmlResult(ret.toString(), comp);
+	return tratarXmlStageResult(ret.toString(), comp);
     }
 
     /**
@@ -128,7 +131,7 @@ public class ResultsRS {
      * @param html
      * @return
      */
-    private List<ResultRow> tratarXmlResult(String html, Competition comp) {
+    private List<ResultRow> tratarXmlStageResult(String html, Competition comp) {
 	Document doc = Jsoup.parse(html);
 	Elements tableElements = doc.select("table.datatable");
 	List<ResultRow> list = new ArrayList<ResultRow>();
@@ -214,7 +217,7 @@ public class ResultsRS {
 	List<ResultRow> list = rDao.getResults(comp);
 	if (list == null || list.size() == 0){
 	    String url = getURLStageResults(comp);
-	    list = readFromUCIWebResults(comp, url);
+	    list = readStageFromUCIWebResults(comp, url);
 	}
 	return list;
     }
@@ -249,5 +252,68 @@ public class ResultsRS {
 		.append(Contracts.URL_STAGE_DATA.replace(Contracts.PHASE1_ID,
 			String.valueOf(comp.getPhase1ID())));
 	return sb.toString();
+    }
+    
+    private List<ResultRow> tratarXmlClassificationResult(String html, Competition comp) {
+	Document doc = Jsoup.parse(html);
+	Elements tableElements = doc.select("table.datatable");
+	List<ResultRow> list = new ArrayList<ResultRow>();
+//
+//	Elements tableRowElements = tableElements.select(":not(thead) tr");
+//
+//	boolean isTeamTimeTrial = true;
+//	// headers
+//	for (int i = 0; i < tableRowElements.size(); i++) {
+//	    Element row = tableRowElements.get(i);
+//	    if (!row.attr("valign").equals("top")) {// los que no tienen
+//						    // valing=top son headers
+//		Elements rowItems = row.select("td.caption");
+//		if (rowItems.get(3).text().equals("Team")) {
+//		    isTeamTimeTrial = false;
+//		    break;
+//		}
+//	    }
+//	}
+//
+//	// Date Event Nat. Class Winner
+//	for (int i = 0; i < tableRowElements.size(); i++) {
+//	    Element row = tableRowElements.get(i);
+//	    if (row.attr("valign").equals("top")) {// los que no tienen
+//						   // valing=top son headers
+//		Elements rowItems = row.select("td");
+//		int idx = 0;
+//		ResultRow.Builder builder;
+//		if (isTeamTimeTrial) {
+//		    builder = new ResultRow.Builder()
+//			    .setRank(rowItems.get(idx++).text())
+//			    .setName(rowItems.get(idx++).text())
+//			    .setNat(rowItems.get(idx++).text())
+//			    .setAge(rowItems.get(idx++).text())
+//			    .setResult(rowItems.get(idx++).text());
+//		} else {
+//		    builder = new ResultRow.Builder()
+//			    .setRank(rowItems.get(idx++).text())
+//			    .setName(rowItems.get(idx++).text())
+//			    .setNat(rowItems.get(idx++).text())
+//			    .setTeam(rowItems.get(idx++).text())
+//			    .setAge(rowItems.get(idx++).text())
+//			    .setResult(rowItems.get(idx++).text());
+//		}
+//
+//		if (rowItems.size() > 6) {
+//		    builder.setPaR(rowItems.get(idx++).text())
+//		    	.setPcR(rowItems.get(idx++).text());
+//		}
+//
+//		ResultRow odr = builder.build();
+//		odr.setCompetition(comp);
+//		persistResultRow(odr);
+//		log.debug(odr.toString());
+//		if (odr.getRank() != null && !odr.getRank().isEmpty()) {
+//		    list.add(odr);
+//		}
+//	    }
+//	}
+	return list;
     }
 }

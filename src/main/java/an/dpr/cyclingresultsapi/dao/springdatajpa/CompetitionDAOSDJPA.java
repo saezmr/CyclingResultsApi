@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import an.dpr.cyclingresultsapi.bean.CompetitionClass;
+import an.dpr.cyclingresultsapi.bean.CompetitionType;
 import an.dpr.cyclingresultsapi.dao.BasicDAO;
 import an.dpr.cyclingresultsapi.dao.CompetitionDAO;
 import an.dpr.cyclingresultsapi.domain.Competition;
@@ -44,6 +45,13 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
     @Override
     public Competition getCompetition(Long competitionId, Long eventID, Long genderID, Long classID, Long phase1ID) {
 	return repo.findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndPhase1ID(competitionId, eventID, genderID, classID, phase1ID);
+    }
+
+    @Override
+    public Competition getCompetition(Long competitionId, Long eventID, Long genderID, Long classID, Long phase1ID,
+	    Long phaseClassificationID) {
+	return repo.findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndPhase1IDAndPhaseClassificationID(
+		competitionId, eventID, genderID, classID, phase1ID, phaseClassificationID);
     }
 
     @Override
@@ -92,6 +100,11 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
 	    log.debug("competis tipo "+cc);
 	    return repo.findByInitDateBetweenAndGenderIDAndClassIDAndCompetitionClass(init, fin, genderID, classID, cc);
 	}
+    }
+
+    @Override
+    public List<Competition> getCompetitions(Date init, Date fin, CompetitionType type) {
+	return repo.findByInitDateBetweenAndCompetitionType(init, fin, type);
     }
 
 }

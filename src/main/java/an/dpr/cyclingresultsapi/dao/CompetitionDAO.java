@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import an.dpr.cyclingresultsapi.bean.CompetitionClass;
+import an.dpr.cyclingresultsapi.bean.CompetitionType;
 import an.dpr.cyclingresultsapi.domain.Competition;
 
 public interface CompetitionDAO {
@@ -11,6 +12,8 @@ public interface CompetitionDAO {
     List<Competition> getCompetitions(Date init, Long genderID, Long classID, CompetitionClass cc);
 
     List<Competition> getCompetitions(Date init, Date fin, Long genderID, Long classID, CompetitionClass cc);
+    
+    List<Competition> getCompetitions(Date init, Date fin, CompetitionType type);
 
     List<Competition> getCompetitionsBetweenDates(Date init, Date fin);
     
@@ -32,6 +35,18 @@ public interface CompetitionDAO {
      * @return
      */
     Competition getCompetition(Long competitionID, Long eventID, Long genderID, Long classID, Long phase1ID);
+    
+    /**
+     * Para clasificaciones, que añaden el phaseClassificationID
+     * @param competitionID
+     * @param eventID
+     * @param genderID
+     * @param classID
+     * @param phase1ID
+     * @param phaseClassificationID
+     * @return
+     */
+    Competition getCompetition(Long competitionID, Long eventID, Long genderID, Long classID, Long phase1ID, Long phaseClassificationID);
     
     /**
      * Devuelve el listado de competitionos etapa y clasificacion general
