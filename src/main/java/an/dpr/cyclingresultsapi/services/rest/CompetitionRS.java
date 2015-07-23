@@ -266,14 +266,13 @@ public class CompetitionRS {
 			.setGenderID(competition.getGenderID())
 			.setClassID(competition.getClassID())
 			.build();
-		persistCompetition(stage);
 		list.add(stage);
 	    }
 	}
 	return list;
     }
     
-    private URI getURLStageResults(Competition comp) throws URISyntaxException{
+    private URI getURLClassifications(Competition comp) throws URISyntaxException{
 	StringBuilder sb = new StringBuilder();
 	sb.append(Contracts.URL_STAGE_1)
 	.append(Contracts.URL_STAGE_EVENT_DATA
@@ -285,7 +284,7 @@ public class CompetitionRS {
 		.replace(Contracts.GENDER_ID, String.valueOf(comp.getGenderID()))
 		.replace(Contracts.CLASS_ID, String.valueOf(comp.getClassID()))
 		)
-	.append(Contracts.URL_STAGE_DATA.replace(Contracts.PHASE1_ID, String.valueOf(comp.getPhase1ID())));
+	.append(Contracts.URL_STAGE_DATA.replace(Contracts.PHASE1_ID,Contracts.PHASE_1_ID_GENERAL_CLASSIFICATIONS.toString()));
 	return new URI(sb.toString());
     }
 
@@ -318,20 +317,24 @@ public class CompetitionRS {
     //ojo al dato, necesitamos saber si una competicion esta acabada o no para actualizar si eso.
     private void loadAndSaveStageCompetitions() throws ParseException {
 	Date fin = new Date();
-	Date init = DateUtil.firstDayOfYear(fin);
-//	Date init = DateUtil.firstDayOfMonth(fin);
-	List<Competition> competitions = dao.getCompetitions(init, fin , CompetitionType.STAGE_EVENT);
-	for (Competition comp : competitions){
-	    List<Competition> stages = getStageRaceCompetitions(comp.getCompetitionID(), comp.getEventID(),
+	Date init = DateUtil.firstDayOfYear(fin);//esto habria que cambiarlo porque el prceso es lentisimo, y adaparlo a las necesidades
+	List<Competition> competitions = dao.getCompetitions(init, fin,
+		CompetitionType.STAGE_EVENT);
+	for (Competition comp : competitions) {
+
+	    List<Competition> stages = getStageRaceCompetitions(
+		    comp.getCompetitionID(), comp.getEventID(),
 		    comp.getGenderID(), comp.getClassID());
-	    for(Competition stage : stages){
-		if (stage.getPhase1ID().equals(Contracts.PHASE_1_ID_GENERAL_CLASSIFICATIONS)){
-		    persistClassifications(stage);
-		} else {
-		    persistCompetition(stage);
+	    if (stages.size() > 0) {
+		persistClassifications(stages.get(0));
+		for (Competition stage : stages) {
+		    // comprobamos que no volvemos a guardar la general
+		    if (!stage.getPhase1ID().equals(
+			    Contracts.PHASE_1_ID_GENERAL_CLASSIFICATIONS)) {
+			persistCompetition(stage);
+		    }
 		}
 	    }
-	    
 	}
     }
 
@@ -353,10 +356,14 @@ public class CompetitionRS {
 	Elements elements = doc.select("div.menu_item_tekst");
 	for(int i = 0;i<elements.size();i++){
 	    Element classification = elements.get(i);
+	    String name = competition.getName();
+	    if (!classification.text().trim().equals("General")){
+		name = name+" "+classification.text();
+	    }
 	    Competition compClass = new Competition.Builder()
 		.setInitDate(competition.getInitDate())
 		.setFinishDate(competition.getFinishDate())
-		.setName(competition.getName()+" "+classification.text())
+		.setName(name )
 		.setPhase1ID(competition.getPhase1ID())
 		.setPhaseClassificationID(Utils.getKeyId(classification.toString(), Contracts.PHASE_CLASSIFICATION_ID_KEY))
 		.setSportID(competition.getSportID())
@@ -378,7 +385,7 @@ public class CompetitionRS {
 	StringBuilder ret = new StringBuilder();
 	try {
 	    HttpClient client = new DefaultHttpClient();// TODO DEPRECATED!
-	    URI url = getURLStageResults(comp);
+	    URI url = getURLClassifications(comp);
 	    HttpGet get = new HttpGet(url);
 	    HttpResponse response = client.execute(get);
 	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");

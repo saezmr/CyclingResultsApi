@@ -49,6 +49,7 @@ public interface Contracts {
     public static final String ALL_COMPS = "http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19004&TaalCode=2&StyleID=0&SportID=102&CompetitionID=-1&EditionID=-1&EventID=-1"
     	+ "&GenderID="+GENDER_ID+"&ClassID="+CLASS_ID
     	+ "&EventPhaseID=0&Phase1ID=0&Phase2ID=0&CompetitionCodeInv=1&PhaseStatusCode=262280&DerivedEventPhaseID=-1&SeasonID=488&StartDateSort=20150108&EndDateSort=20151225&Detail=1&DerivedCompetitionID=-1&S00=-3&S01=2&S02=1&PageNr0=-1&Cache=8";
+    //+"&PageNr0=-1"; para que se muestren todos los resultados y no solo la primer pagina (40 eventos)
     //stage results url
     public static final String ALL_RESULTS = "&S00=1&S01=2&S02=3&PageNr0=-1";
     public static final String URL_STAGE_1="http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19006&CompetitionCodeInv=1&Phase2ID=0&Phase3ID=0&DerivedEventPhaseID=-1&Detail=1&Ranking=0"+ALL_RESULTS;
@@ -62,4 +63,3 @@ public interface Contracts {
 	    +"&ClassID="+CLASS_ID+"&GenderID="+GENDER_ID+"&EventID="+EVENT_ID+"&EventPhaseID="+EVENT_PHASE_ID;
 
 }
-
