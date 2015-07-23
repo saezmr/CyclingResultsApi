@@ -232,7 +232,7 @@ public class CompetitionRS {
 		.replace(Contracts.CLASS_ID,competition.getClassID().toString())
 		.replace(Contracts.GENDER_ID,competition.getGenderID().toString())
 		.replace(Contracts.EVENT_ID,competition.getEventID().toString())
-		.replace(Contracts.EVENT_PHASE_ID,competition.getEventPhaseID().toString())
+		.replace(Contracts.EVENT_PHASE_ID,competition.getEventPhaseID() !=null ? competition.getEventPhaseID().toString() : "-1")
 		);
 	
 	return new URI(sb.toString());
@@ -266,7 +266,6 @@ public class CompetitionRS {
 			.setGenderID(competition.getGenderID())
 			.setClassID(competition.getClassID())
 			.build();
-		log.debug(getURLStageResults(stage));
 		persistCompetition(stage);
 		list.add(stage);
 	    }
@@ -274,7 +273,7 @@ public class CompetitionRS {
 	return list;
     }
     
-    private String getURLStageResults(Competition comp){
+    private URI getURLStageResults(Competition comp) throws URISyntaxException{
 	StringBuilder sb = new StringBuilder();
 	sb.append(Contracts.URL_STAGE_1)
 	.append(Contracts.URL_STAGE_EVENT_DATA
@@ -287,7 +286,7 @@ public class CompetitionRS {
 		.replace(Contracts.CLASS_ID, String.valueOf(comp.getClassID()))
 		)
 	.append(Contracts.URL_STAGE_DATA.replace(Contracts.PHASE1_ID, String.valueOf(comp.getPhase1ID())));
-	return sb.toString();
+	return new URI(sb.toString());
     }
 
     /**
@@ -301,17 +300,16 @@ public class CompetitionRS {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/loadCompetitions/")
     public Boolean getLastCompetitions() throws URISyntaxException, ParseException {
-//	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.ELITE_CLASS_ID);
-//	log.debug("competiciones masculinas elite cargadas con exito");
-//	loadYearCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.ELITE_CLASS_ID);
-//	log.debug("competiciones femeninas elite cargadas con exito");
-//	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.UNDER23_CLASS_ID);
-//	log.debug("competiciones masculinas sub23 cargadas con exito");
-//	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID);
-//	log.debug("competiciones masculinas junior cargadas con exito");
-//	loadYearCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID);
-//	log.debug("competiciones femeninas junior cargadas con exito");
-//	
+	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.ELITE_CLASS_ID);
+	log.debug("competiciones masculinas elite cargadas con exito");
+	loadYearCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.ELITE_CLASS_ID);
+	log.debug("competiciones femeninas elite cargadas con exito");
+	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.UNDER23_CLASS_ID);
+	log.debug("competiciones masculinas sub23 cargadas con exito");
+	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID);
+	log.debug("competiciones masculinas junior cargadas con exito");
+	loadYearCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID);
+	log.debug("competiciones femeninas junior cargadas con exito");
 	//ahora cargaremos todas las "stage competitions" o clasificaicones internas de una prueba
 	loadAndSaveStageCompetitions();
 	return Boolean.TRUE;
@@ -320,8 +318,8 @@ public class CompetitionRS {
     //ojo al dato, necesitamos saber si una competicion esta acabada o no para actualizar si eso.
     private void loadAndSaveStageCompetitions() throws ParseException {
 	Date fin = new Date();
-//	Date init = DateUtil.firstDayOfYear(fin);
-	Date init = DateUtil.firstDayOfMonth(fin);
+	Date init = DateUtil.firstDayOfYear(fin);
+//	Date init = DateUtil.firstDayOfMonth(fin);
 	List<Competition> competitions = dao.getCompetitions(init, fin , CompetitionType.STAGE_EVENT);
 	for (Competition comp : competitions){
 	    List<Competition> stages = getStageRaceCompetitions(comp.getCompetitionID(), comp.getEventID(),
@@ -380,12 +378,12 @@ public class CompetitionRS {
 	StringBuilder ret = new StringBuilder();
 	try {
 	    HttpClient client = new DefaultHttpClient();// TODO DEPRECATED!
-//	    String url = "";TODO SERIA LA URL DE LA CLASIFICAICON GENERAL
-//	    HttpGet get = new HttpGet(url);
-//	    HttpResponse response = client.execute(get);
-//	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");
-	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/tour2015General.htm";
-	    FileReader isr = new FileReader(new File(file));
+	    URI url = getURLStageResults(comp);
+	    HttpGet get = new HttpGet(url);
+	    HttpResponse response = client.execute(get);
+	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");
+//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/tour2015General.htm";
+//	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {
@@ -394,6 +392,8 @@ public class CompetitionRS {
 	} catch (ClientProtocolException e) {
 	    log.error("error leyendo info", e);
 	} catch (IOException e) {
+	    log.error("error leyendo info", e);
+	} catch (URISyntaxException e) {
 	    log.error("error leyendo info", e);
 	}
 	return ret.toString();

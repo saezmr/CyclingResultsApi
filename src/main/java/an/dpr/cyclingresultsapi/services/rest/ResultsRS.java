@@ -203,17 +203,40 @@ public class ResultsRS {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/stage/{competitionId},{eventID},{genderID}, {classID},{phase1Id}")
+    @Path("/stage/{competitionId},{eventID},{genderID},{classID},{phase1ID}")
     public List<ResultRow> getStageResult(
 	    @PathParam("competitionId") String competitionID,
 	    @PathParam("eventID") String eventID,
 	    @PathParam("genderID") String genderID,
 	    @PathParam("classID") String classID,
-	    @PathParam("phase1Id") String phase1ID) {
+	    @PathParam("phase1ID") String phase1ID) {
 	Competition comp = dao.getCompetition(Long.parseLong(competitionID),
 		Long.parseLong(eventID),
 		Long.parseLong(genderID), Long.parseLong(classID),
 		Long.parseLong(phase1ID));
+	List<ResultRow> list = rDao.getResults(comp);
+	if (list == null || list.size() == 0){
+	    String url = getURLStageResults(comp);
+	    list = readStageFromUCIWebResults(comp, url);
+	}
+	return list;
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/classification/{competitionId},{eventID},{genderID},{classID},{phase1ID},{phaseClassificationID}")
+    public List<ResultRow> getClassificationResult(
+	    @PathParam("competitionId") String competitionID,
+	    @PathParam("eventID") String eventID,
+	    @PathParam("genderID") String genderID,
+	    @PathParam("classID") String classID,
+	    @PathParam("phase1ID") String phase1ID,
+	    @PathParam("phaseClassificationID") String phaseClassificationID
+	    ) {
+	Competition comp = dao.getCompetition(Long.parseLong(competitionID),
+		Long.parseLong(eventID),
+		Long.parseLong(genderID), Long.parseLong(classID),
+		Long.parseLong(phase1ID), Long.parseLong(phaseClassificationID));
 	List<ResultRow> list = rDao.getResults(comp);
 	if (list == null || list.size() == 0){
 	    String url = getURLStageResults(comp);
