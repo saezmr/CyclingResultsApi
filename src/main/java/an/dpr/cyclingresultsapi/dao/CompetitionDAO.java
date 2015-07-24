@@ -1,7 +1,10 @@
 package an.dpr.cyclingresultsapi.dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.jsoup.nodes.Element;
 
 import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.bean.CompetitionType;
@@ -49,11 +52,19 @@ public interface CompetitionDAO {
     Competition getCompetition(Long competitionID, Long eventID, Long genderID, Long classID, Long phase1ID, Long phaseClassificationID);
     
     /**
-     * Devuelve el listado de competitionos etapa y clasificacion general
-     * TODO -> CLASIFICAICONES GENERALES ALTERNATIVAS (PUNTOS, MONTAñA...)
+     * Devuelve el listado de competitionos etapa de una competi 
      * @param competitionId
      * @return
      */
-    List<Competition> getStageCompetitions(Long competitionId);
+    List<Competition> getCompetitionStages(Competition competition);
+    
+    /**
+     * Devuelve el listado de clasificacion generales de una competi 
+     * @param competition
+     * 	Busca todas las clasificaciones. Buscando por competitionid, eventid, genderid, classid y phase1ID = 0
+     * @return
+     */
+    List<Competition> getCompetitionClassifications(Competition competition);
+
     
 }

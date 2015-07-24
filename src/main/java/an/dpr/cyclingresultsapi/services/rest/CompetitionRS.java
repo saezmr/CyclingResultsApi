@@ -127,7 +127,7 @@ public class CompetitionRS {
 	    
 	} else {
 	    try {
-		ret = DateUtil.parse(cadena, DateUtil.DDMMYYYY);
+		ret = DateUtil.parse(cadena, Contracts.DATE_FORMAT_SEARCH_COMPS);
 	    } catch (CyclingResultsException e) {
 		log.error("",e);
 	    }
@@ -290,51 +290,106 @@ public class CompetitionRS {
 
     /**
      * Last competitions finished or in course.
-     * 
+     * TODO posibilidad de filtrar la carga tambien por fechas
+     * @param initDate and finishDate in format yyyymmdd
      * @return List<Competition>
      * @throws URISyntaxException
      * @throws ParseException 
+     * @throws CyclingResultsException 
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/loadCompetitions/")
-    public Boolean getLastCompetitions() throws URISyntaxException, ParseException {
-	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.ELITE_CLASS_ID);
-	log.debug("competiciones masculinas elite cargadas con exito");
-	loadYearCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.ELITE_CLASS_ID);
-	log.debug("competiciones femeninas elite cargadas con exito");
-	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.UNDER23_CLASS_ID);
-	log.debug("competiciones masculinas sub23 cargadas con exito");
-	loadYearCompetitions(Contracts.MEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID);
-	log.debug("competiciones masculinas junior cargadas con exito");
-	loadYearCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID);
-	log.debug("competiciones femeninas junior cargadas con exito");
-	//ahora cargaremos todas las "stage competitions" o clasificaicones internas de una prueba
-	loadAndSaveStageCompetitions();
-	return Boolean.TRUE;
+    @Path("/loadCompetitions/{genderID},{classID},{initDate},{finishDate}")
+    public Boolean loadCompetitionsService(
+	    @PathParam("genderID") String  genderID,
+	    @PathParam("classID") String classID,
+	    @PathParam("initDate") String initDate,
+	    @PathParam("finishDate") String finishDate
+	    ) throws URISyntaxException, ParseException, CyclingResultsException {
+	Boolean ret;
+	if ((genderID != null && !genderID.isEmpty()) && (classID != null && !classID.isEmpty())){
+	    loadCompetitions(genderID, classID, initDate, finishDate);
+	    log.debug("competiciones genderID="+genderID+", classID="+classID+" cargadas con exito");
+	    ret = Boolean.TRUE;
+	} else if ((genderID == null || genderID.isEmpty()) && (classID == null || classID.isEmpty())){
+	    loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.ELITE_CLASS_ID, initDate, finishDate);
+	    log.debug("competiciones masculinas elite cargadas con exito");
+	    loadCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.ELITE_CLASS_ID, initDate, finishDate);
+	    log.debug("competiciones femeninas elite cargadas con exito");
+	    loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.UNDER23_CLASS_ID, initDate, finishDate);
+	    log.debug("competiciones masculinas sub23 cargadas con exito");
+	    loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID, initDate, finishDate);
+	    log.debug("competiciones masculinas junior cargadas con exito");
+	    loadCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID, initDate, finishDate);
+	    log.debug("competiciones femeninas junior cargadas con exito");
+	    ret = Boolean.TRUE;
+	} else {
+	    ret = Boolean.FALSE;
+	}
+	if (ret){
+	    //ahora cargaremos todas las "stage competitions" o clasificaicones internas de una prueba
+	    loadAndSaveStageCompetitions(initDate, finishDate);
+	}
+	return ret;
     }
     
     //ojo al dato, necesitamos saber si una competicion esta acabada o no para actualizar si eso.
-    private void loadAndSaveStageCompetitions() throws ParseException {
-	Date fin = new Date();
-	Date init = DateUtil.firstDayOfYear(fin);//esto habria que cambiarlo porque el prceso es lentisimo, y adaparlo a las necesidades
+    private void loadAndSaveStageCompetitions(String initDate, String finishDate) throws ParseException, CyclingResultsException {
+	Date init = DateUtil.parse(initDate, Contracts.DATE_FORMAT_SEARCH_COMPS);
+	Calendar cal = Calendar.getInstance();
+	cal.setTime(DateUtil.parse(finishDate, Contracts.DATE_FORMAT_SEARCH_COMPS));
+	cal.add(Calendar.DAY_OF_YEAR,1);
+	Date fin = cal.getTime(); 
 	List<Competition> competitions = dao.getCompetitions(init, fin,
-		CompetitionType.STAGE_EVENT);
+		CompetitionType.STAGES);
 	for (Competition comp : competitions) {
-
-	    List<Competition> stages = getStageRaceCompetitions(
-		    comp.getCompetitionID(), comp.getEventID(),
-		    comp.getGenderID(), comp.getClassID());
-	    if (stages.size() > 0) {
-		persistClassifications(stages.get(0));
-		for (Competition stage : stages) {
-		    // comprobamos que no volvemos a guardar la general
-		    if (!stage.getPhase1ID().equals(
-			    Contracts.PHASE_1_ID_GENERAL_CLASSIFICATIONS)) {
-			persistCompetition(stage);
+	    if(isNeedLoadStagesAndClassifications(comp)){
+		log.debug("la competicion "+comp.getName()+" no esta finalizada, cargamos info");
+		List<Competition> stages = getStageRaceCompetitions(
+			comp.getCompetitionID(), comp.getEventID(),
+			comp.getGenderID(), comp.getClassID());
+		if (stages.size() > 0) {
+		    persistClassifications(stages.get(0));
+		    for (Competition stage : stages) {
+			// comprobamos que no volvemos a guardar la general
+			if (!stage.getPhase1ID().equals(Contracts.PHASE_1_ID_GENERAL_CLASSIFICATIONS)) {
+			    stage.setCompetitionType(CompetitionType.STAGE_STAGES);
+			    persistCompetition(stage);
+			}
 		    }
 		}
+	    } else {
+		log.debug("la competicion "+comp.getName()+" SI esta finalizada, no realizamos la carga");
 	    }
+	}
+    }
+    
+    /**
+     *  
+     * @return 
+     * 	false if exists stages/classifications for the competition and the current date is greather than competition's finish date
+     * 	true in other cases
+     */
+    private boolean isNeedLoadStagesAndClassifications(Competition comp) {
+	boolean ret = false;
+	if (dao.getCompetitionClassifications(comp).size()==0 || dao.getCompetitionStages(comp).size()==0){
+	    ret = true;
+	} else if (!competitionFinalizada(comp)){
+	    ret = true;
+	}
+	return ret;
+    }
+
+    private boolean competitionFinalizada(Competition comp) {
+	try {
+	    Calendar cal = Calendar.getInstance();
+	    cal.setTime(DateUtil.dateWithoutHour(comp.getFinishDate()));
+	    cal.add(Calendar.DAY_OF_YEAR, 1);
+	    Date finishDate = cal.getTime(); 
+	    return finishDate.after(new Date());
+	} catch (ParseException e) {
+	    log.error("Error calculando fecha", e);
+	    return false;
 	}
     }
 
@@ -374,6 +429,7 @@ public class CompetitionRS {
 		.setCompetitionID(competition.getCompetitionID())
 		.setGenderID(competition.getGenderID())
 		.setClassID(competition.getClassID())
+		.setCompetitionType(CompetitionType.CLASSIFICATION_STAGES)
 		.build();
 	    classifications.add(compClass);
 	}
@@ -406,11 +462,13 @@ public class CompetitionRS {
 	return ret.toString();
     }
 
-    private void loadYearCompetitions(String genderID, String classID) {
+    private void loadCompetitions(String genderID, String classID, String initDate, String finishDate) {
 	StringBuilder ret = new StringBuilder();
 	try {
 	    HttpClient client = new DefaultHttpClient();
-	    HttpGet get = new HttpGet(getURLCompetitions(genderID, classID));
+	    String url = getURLCompetitions(genderID, classID, initDate, finishDate);
+	    log.debug("URL:"+url);
+	    HttpGet get = new HttpGet(url);
 	    HttpResponse response = client.execute(get);
 	    InputStreamReader isr = new InputStreamReader(response.getEntity()
 		    .getContent(), "cp1252");
@@ -431,10 +489,13 @@ public class CompetitionRS {
 	log.debug(list.size()+" competitions load, genderID="+genderID+", classID="+classID);
     }
     
-    private String getURLCompetitions(String genderID, String classID) {
+    private String getURLCompetitions(String genderID, String classID, String initDate, String finishDate) {
 	String url = Contracts.ALL_COMPS
 		.replace(Contracts.GENDER_ID, genderID)
-		.replace(Contracts.CLASS_ID, classID);
+		.replace(Contracts.CLASS_ID, classID)
+		.replace(Contracts.INIT_DATE, initDate)
+		.replace(Contracts.FINISH_DATE, finishDate)
+		;
 	log.debug(url);
 	return url;
     }

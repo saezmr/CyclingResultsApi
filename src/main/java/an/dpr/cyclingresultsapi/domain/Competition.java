@@ -275,13 +275,13 @@ public class Competition {
     
     public void calculateCompetitionType(){
         if (Contracts.PAGE_ID_ONE_DAY.equals(pageID)){
-            setCompetitionType(CompetitionType.ONE_DAY_EVENT);
+            setCompetitionType(CompetitionType.ONE_DAY);
         } else if (Contracts.PAGE_ID_STAGE_RACE.equals(pageID)){
-            setCompetitionType(CompetitionType.STAGE_EVENT);
+            setCompetitionType(CompetitionType.STAGES);
         } else if (initDate.equals(finishDate)){
-            setCompetitionType(CompetitionType.ONE_DAY_EVENT);
+            setCompetitionType(CompetitionType.ONE_DAY);
         } else if (!initDate.equals(finishDate)){
-            setCompetitionType(CompetitionType.STAGE_EVENT);
+            setCompetitionType(CompetitionType.STAGES);
         }
     }
     
@@ -355,6 +355,7 @@ public class Competition {
 	private Long competitionID;
 	private String winner;
 	private String leader;
+	private CompetitionType competitionType;
 
 	public Builder() {
 	}
@@ -386,7 +387,7 @@ public class Competition {
 		comp.setInitDate(initDate);
 	    if (finishDate != null)
 		comp.setFinishDate(finishDate);
-
+	    comp.setCompetitionType(competitionType);
 	    return comp;
 	}
 
@@ -460,6 +461,11 @@ public class Competition {
 
 	public Builder setCompetitionClass(CompetitionClass competitionClass) {
 	    this.competitionClass = competitionClass;
+	    return this;
+	}
+	
+	public Builder setCompetitionType(CompetitionType competitionType) {
+	    this.competitionType = competitionType;
 	    return this;
 	}
 
