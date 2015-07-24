@@ -274,11 +274,7 @@ public class Competition {
     }
     
     public void calculateCompetitionType(){
-        if (Contracts.PAGE_ID_ONE_DAY.equals(pageID)){
-            setCompetitionType(CompetitionType.ONE_DAY);
-        } else if (Contracts.PAGE_ID_STAGE_RACE.equals(pageID)){
-            setCompetitionType(CompetitionType.STAGES);
-        } else if (initDate.equals(finishDate)){
+        if (initDate.equals(finishDate) || CompetitionClass.CN.equals(competitionClass)){
             setCompetitionType(CompetitionType.ONE_DAY);
         } else if (!initDate.equals(finishDate)){
             setCompetitionType(CompetitionType.STAGES);
