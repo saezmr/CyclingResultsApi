@@ -14,7 +14,6 @@ import an.dpr.cyclingresultsapi.dao.BasicDAO;
 import an.dpr.cyclingresultsapi.dao.CompetitionDAO;
 import an.dpr.cyclingresultsapi.domain.Competition;
 import an.dpr.cyclingresultsapi.repository.CompetitionRepo;
-import an.dpr.cyclingresultsapi.util.Contracts;
 
 /**
  * Implementacion Spring Data JPA para la persistencia de eventos
@@ -121,6 +120,11 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
 	return repo.findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndCompetitionType(competition.getCompetitionID(),
 		competition.getEventID(), competition.getGenderID(), competition.getClassID(), 
 		CompetitionType.CLASSIFICATION_STAGES);
+    }
+
+    @Override
+    public List<Competition> getCompetitionAllEditions(long competitionID) {
+	return repo.findByCompetitionID(competitionID);
     }
 
 }

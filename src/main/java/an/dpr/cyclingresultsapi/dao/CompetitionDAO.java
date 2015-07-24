@@ -1,10 +1,7 @@
 package an.dpr.cyclingresultsapi.dao;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.jsoup.nodes.Element;
 
 import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.bean.CompetitionType;
@@ -65,6 +62,8 @@ public interface CompetitionDAO {
      * @return
      */
     List<Competition> getCompetitionClassifications(Competition competition);
+
+    List<Competition> getCompetitionAllEditions(long parseLong);
 
     
 }

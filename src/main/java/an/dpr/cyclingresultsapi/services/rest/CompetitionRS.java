@@ -1,8 +1,6 @@
 package an.dpr.cyclingresultsapi.services.rest;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -81,14 +79,18 @@ public class CompetitionRS {
 	    @PathParam("finDate") String finDate,
 	    @PathParam("genderID") String genderID,
 	    @PathParam("classID") String classID,
-	    @PathParam("competitionClass") String competitionClass) throws ParseException {
+	    @PathParam("competitionClass") String competitionClass){
 	List<Competition> list = null;
-	Date id = getDate(initDate, false);
-	Date fd = getDate(finDate, true);
-	if (fd == null){
-	    list = dao.getCompetitions(id, getGenderID(genderID), getClassID(classID), getCompetitionClass(competitionClass));
-	} else {
-	    list = dao.getCompetitions(id, fd, getGenderID(genderID), getClassID(classID), getCompetitionClass(competitionClass));
+	try {
+	    Date id = getDate(initDate, false);
+	    Date fd = getDate(finDate, true);
+	    if (fd == null){
+		list = dao.getCompetitions(id, getGenderID(genderID), getClassID(classID), getCompetitionClass(competitionClass));
+	    } else {
+		list = dao.getCompetitions(id, fd, getGenderID(genderID), getClassID(classID), getCompetitionClass(competitionClass));
+	    }
+	} catch (ParseException e) {
+	    log.error("Error obteniendo competiciones", e);
 	}
 	return list;
     }
@@ -168,6 +170,18 @@ public class CompetitionRS {
 	Date fin= cal.getTime();
 	
 	return dao.getCompetitionsBetweenDates(init, fin);
+    }
+    
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/allEditions/{competitionID}")
+    public List<Competition> getAllEditions(@PathParam("competitionID") String competitionID){
+	try{
+	    return dao.getCompetitionAllEditions(Long.parseLong(competitionID));
+	} catch(Exception e){
+	    log.error("Error obteniendo ediciones de la competicion "+competitionID, e);
+	    return new ArrayList<Competition>();
+	}
     }
     
     @GET
@@ -293,9 +307,6 @@ public class CompetitionRS {
      * TODO posibilidad de filtrar la carga tambien por fechas
      * @param initDate and finishDate in format yyyymmdd
      * @return List<Competition>
-     * @throws URISyntaxException
-     * @throws ParseException 
-     * @throws CyclingResultsException 
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -305,27 +316,32 @@ public class CompetitionRS {
 	    @PathParam("classID") String classID,
 	    @PathParam("initDate") String initDate,
 	    @PathParam("finishDate") String finishDate
-	    ) throws URISyntaxException, ParseException, CyclingResultsException {
+	    ) {
 	Boolean ret;
-	if ((genderID != null && !genderID.isEmpty()) && (classID != null && !classID.isEmpty())){
-	    loadCompetitions(genderID, classID, initDate, finishDate);
-	    log.info("competiciones genderID="+genderID+", classID="+classID+" cargadas con exito");
-	    ret = Boolean.TRUE;
-	} else if ((genderID == null || genderID.isEmpty()) && (classID == null || classID.isEmpty())){
-	    loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.ELITE_CLASS_ID, initDate, finishDate);
-	    loadCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.ELITE_CLASS_ID, initDate, finishDate);
-	    loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.UNDER23_CLASS_ID, initDate, finishDate);
-	    loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID, initDate, finishDate);
-	    loadCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID, initDate, finishDate);
-	    ret = Boolean.TRUE;
-	} else {
+	try{
+	    if ((genderID != null && !genderID.isEmpty()) && (classID != null && !classID.isEmpty())){
+		loadCompetitions(genderID, classID, initDate, finishDate);
+		log.info("competiciones genderID="+genderID+", classID="+classID+" cargadas con exito");
+		ret = Boolean.TRUE;
+	    } else if ((genderID == null || genderID.isEmpty()) && (classID == null || classID.isEmpty())){
+		loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.ELITE_CLASS_ID, initDate, finishDate);
+		loadCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.ELITE_CLASS_ID, initDate, finishDate);
+		loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.UNDER23_CLASS_ID, initDate, finishDate);
+		loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID, initDate, finishDate);
+		loadCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID, initDate, finishDate);
+		ret = Boolean.TRUE;
+	    } else {
+		ret = Boolean.FALSE;
+	    }
+	    if (ret){
+		//ahora cargaremos todas las "stage competitions" o clasificaicones internas de una prueba
+		loadAndSaveStageCompetitions(initDate, finishDate);
+	    }
+	    log.info("competitions load is finished "+genderID+","+classID+","+initDate+","+finishDate);
+	} catch(Exception e){
+	    log.error("Error durante la carga de datos", e);
 	    ret = Boolean.FALSE;
 	}
-	if (ret){
-	    //ahora cargaremos todas las "stage competitions" o clasificaicones internas de una prueba
-	    loadAndSaveStageCompetitions(initDate, finishDate);
-	}
-	log.info("competitions load is finished "+genderID+","+classID+","+initDate+","+finishDate);
 	return ret;
     }
     
