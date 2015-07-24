@@ -384,7 +384,7 @@ public class CompetitionRS {
      */
     private boolean isNeedLoadStagesAndClassifications(Competition comp) {
 	boolean ret = false;
-	if (comp.getCompetitionType().equals(CompetitionType.STAGES)){
+	if (CompetitionType.STAGES.equals(comp.getCompetitionType())){
 	    if (dao.getCompetitionClassifications(comp).size()==0 || dao.getCompetitionStages(comp).size()==0){
 		ret = true;
 	    } else if (!competitionFinalizada(comp)){
