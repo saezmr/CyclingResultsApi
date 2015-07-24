@@ -193,8 +193,21 @@ public class CompetitionRS {
 	    @PathParam("genderID") String genderID,
 	    @PathParam("classID") String classID
 	    ) {
-	return getStageRaceCompetitions(Long.parseLong(competitionID), Long.parseLong(eventID),
-		Long.parseLong(genderID), Long.parseLong(classID));
+	Competition comp = new Competition.Builder()
+		.setCompetitionID(Long.parseLong(competitionID)) 
+		.setEventID(Long.parseLong(eventID))
+		.setGenderID(Long.parseLong(genderID)) 
+		.setClassID(Long.parseLong(classID))
+		.build();
+	List<Competition> list = new ArrayList();
+	list.addAll(dao.getCompetitionClassifications(comp));
+	list.addAll(dao.getCompetitionStages(comp));
+	if (list.size() == 0){//esto no deberia ocurrir, pero por si aca
+	    list = getStageRaceCompetitions(Long.parseLong(competitionID), Long.parseLong(eventID),
+		    Long.parseLong(genderID), Long.parseLong(classID));
+	}
+	return list;
+	
     }
 	
     /**
