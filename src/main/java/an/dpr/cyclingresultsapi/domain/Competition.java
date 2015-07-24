@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.bean.CompetitionType;
-import an.dpr.cyclingresultsapi.util.Contracts;
 import an.dpr.cyclingresultsapi.util.DateUtil;
 
 /*PAHSE Y PHASE CLASSIFICATION FORMAN UN "todo".
