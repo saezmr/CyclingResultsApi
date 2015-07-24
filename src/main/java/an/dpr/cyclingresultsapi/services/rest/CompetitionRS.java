@@ -317,7 +317,7 @@ public class CompetitionRS {
 
     /**
      * Last competitions finished or in course.
-     * TODO posibilidad de filtrar la carga tambien por fechas
+     * TODO estamos teniendo un problema, no carga una comptitionid para años distintos!!
      * @param initDate and finishDate in format yyyymmdd
      * @return List<Competition>
      */
@@ -358,7 +358,10 @@ public class CompetitionRS {
 	return ret;
     }
     
-    //ojo al dato, necesitamos saber si una competicion esta acabada o no para actualizar si eso.
+    /*
+     * TODO tenemos un tema con los campeonatos nacionales porque se marcan como "stages" al tener
+     * fechas ini y fin no iguales, pero realmente no tienen stages!!
+     */
     private void loadAndSaveStageCompetitions(String initDate, String finishDate) throws ParseException, CyclingResultsException {
 	Date init = DateUtil.parse(initDate, Contracts.DATE_FORMAT_SEARCH_COMPS);
 	Calendar cal = Calendar.getInstance();
@@ -573,13 +576,15 @@ public class CompetitionRS {
 
     private void persistCompetition(Competition comp) {
 	if (comp!= null && comp.getCompetitionID() != null ){
-	    Competition saveComp= dao.getCompetition(comp.getCompetitionID(), comp.getEventID(), 
+	    Competition saveComp= dao.getCompetition(comp.getCompetitionID(), comp.getEventID(), comp.getEditionID(),
 		    comp.getGenderID(), comp.getClassID(), comp.getPhase1ID(), comp.getPhaseClassificationID());
 	    if (saveComp == null){
 		dao.save(comp);
+		log.info("persistido "+comp);
 	    } else if (!saveComp.getName().equals(comp.getName())){
 		saveComp.setName(comp.getName());
 		dao.save(saveComp);
+		log.info("persistido cambio nombre"+comp);
 	    }
 	}
     }

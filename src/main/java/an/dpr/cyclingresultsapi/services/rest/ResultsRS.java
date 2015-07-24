@@ -224,17 +224,18 @@ public class ResultsRS {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/classification/{competitionId},{eventID},{genderID},{classID},{phase1ID},{phaseClassificationID}")
+    @Path("/classification/{competitionId},{eventID},{editionID},{genderID},{classID},{phase1ID},{phaseClassificationID}")
     public List<ResultRow> getClassificationResult(
 	    @PathParam("competitionId") String competitionID,
 	    @PathParam("eventID") String eventID,
+	    @PathParam("editionID") String editionID,
 	    @PathParam("genderID") String genderID,
 	    @PathParam("classID") String classID,
 	    @PathParam("phase1ID") String phase1ID,
 	    @PathParam("phaseClassificationID") String phaseClassificationID
 	    ) {
 	Competition comp = dao.getCompetition(Long.parseLong(competitionID),
-		Long.parseLong(eventID),
+		Long.parseLong(eventID), Long.parseLong(editionID),
 		Long.parseLong(genderID), Long.parseLong(classID),
 		Long.parseLong(phase1ID), Long.parseLong(phaseClassificationID));
 	List<ResultRow> list = rDao.getResults(comp);

@@ -44,9 +44,10 @@ public interface CompetitionDAO {
      * @param classID
      * @param phase1ID
      * @param phaseClassificationID
+     * @param long1 
      * @return
      */
-    Competition getCompetition(Long competitionID, Long eventID, Long genderID, Long classID, Long phase1ID, Long phaseClassificationID);
+    Competition getCompetition(Long competitionID, Long eventID, Long editionId, Long genderID, Long classID, Long phase1ID, Long phaseClassificationID);
     
     /**
      * Devuelve el listado de competitionos etapa de una competi 

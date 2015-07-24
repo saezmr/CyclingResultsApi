@@ -48,5 +48,9 @@ public interface CompetitionRepo  extends CrudRepository<Competition, Long> {
 
     List<Competition> findByInitDateGreaterThanAndGenderIDAndClassIDAndCompetitionClassIsNotNull(Date time,
 	    Long genderID, Long classID);
+
+    Competition findByCompetitionIDAndEventIDAndEditionIDAndGenderIDAndClassIDAndPhase1IDAndPhaseClassificationID(
+	    Long competitionId, Long eventID, Long editionID, Long genderID, Long classID, Long phase1id,
+	    Long phaseClassificationID);
     
 }
