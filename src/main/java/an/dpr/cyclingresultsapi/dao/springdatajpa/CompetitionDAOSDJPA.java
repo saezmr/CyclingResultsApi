@@ -82,7 +82,6 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
 	throw new RuntimeException("Por implementar");
     }
 
-    //TODO a ver, solo competitiones principales, no sacar sus etapas y clasificaciones!!
     @Override
     public List<Competition> getCompetitions(Date time, Long genderID, Long classID, CompetitionClass cc) {
 	if (CompetitionClass.ALL.equals(cc)){

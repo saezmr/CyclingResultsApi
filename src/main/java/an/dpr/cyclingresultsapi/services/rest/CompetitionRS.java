@@ -217,7 +217,7 @@ public class CompetitionRS {
 	} catch (IOException e) {
 	    log.error("error leyendo info ", e);
 	}
-	log.info(ret.toString());
+	log.debug(ret.toString());
 	return tratarXmlStageRaceCompetitions(ret.toString(), competition);
     }
 
@@ -309,19 +309,14 @@ public class CompetitionRS {
 	Boolean ret;
 	if ((genderID != null && !genderID.isEmpty()) && (classID != null && !classID.isEmpty())){
 	    loadCompetitions(genderID, classID, initDate, finishDate);
-	    log.debug("competiciones genderID="+genderID+", classID="+classID+" cargadas con exito");
+	    log.info("competiciones genderID="+genderID+", classID="+classID+" cargadas con exito");
 	    ret = Boolean.TRUE;
 	} else if ((genderID == null || genderID.isEmpty()) && (classID == null || classID.isEmpty())){
 	    loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.ELITE_CLASS_ID, initDate, finishDate);
-	    log.debug("competiciones masculinas elite cargadas con exito");
 	    loadCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.ELITE_CLASS_ID, initDate, finishDate);
-	    log.debug("competiciones femeninas elite cargadas con exito");
 	    loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.UNDER23_CLASS_ID, initDate, finishDate);
-	    log.debug("competiciones masculinas sub23 cargadas con exito");
 	    loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID, initDate, finishDate);
-	    log.debug("competiciones masculinas junior cargadas con exito");
 	    loadCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID, initDate, finishDate);
-	    log.debug("competiciones femeninas junior cargadas con exito");
 	    ret = Boolean.TRUE;
 	} else {
 	    ret = Boolean.FALSE;
@@ -330,6 +325,7 @@ public class CompetitionRS {
 	    //ahora cargaremos todas las "stage competitions" o clasificaicones internas de una prueba
 	    loadAndSaveStageCompetitions(initDate, finishDate);
 	}
+	log.info("competitions load is finished "+genderID+","+classID+","+initDate+","+finishDate);
 	return ret;
     }
     
@@ -344,7 +340,7 @@ public class CompetitionRS {
 		CompetitionType.STAGES);
 	for (Competition comp : competitions) {
 	    if(isNeedLoadStagesAndClassifications(comp)){
-		log.debug("la competicion "+comp.getName()+" no esta finalizada, cargamos info");
+		log.info("la competicion "+comp.getName()+" no esta cargada o finalizada, cargamos info");
 		List<Competition> stages = getStageRaceCompetitions(
 			comp.getCompetitionID(), comp.getEventID(),
 			comp.getGenderID(), comp.getClassID());
@@ -359,7 +355,7 @@ public class CompetitionRS {
 		    }
 		}
 	    } else {
-		log.debug("la competicion "+comp.getName()+" SI esta finalizada, no realizamos la carga");
+		log.info("la competicion "+comp.getName()+" SI esta cargada y finalizada, no realizamos la carga");
 	    }
 	}
     }
@@ -486,7 +482,7 @@ public class CompetitionRS {
 	}
 	//log.debug(ret.toString());
 	List<Competition> list = tratarXmlCompetitions(ret.toString());
-	log.debug(list.size()+" competitions load, genderID="+genderID+", classID="+classID);
+	log.info(list.size()+" competitions load, genderID="+genderID+", classID="+classID+", initDate="+initDate+",finDate="+finishDate);
     }
     
     private String getURLCompetitions(String genderID, String classID, String initDate, String finishDate) {
