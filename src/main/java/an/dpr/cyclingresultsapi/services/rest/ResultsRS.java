@@ -50,7 +50,6 @@ import an.dpr.cyclingresultsapi.util.Utils;
  *         &Detail=1&Ranking=0&DerivedEventPhaseID=-1&S00=1&S01=2&S02=3&PageNr0
  *         =-1&Cache=8
  *         
- *   //TODO FALTARIAN LAS CLASIFICACIONES GENERALES "COMPLEMENTARIAS", MONTAÑA, PUNTOS...
  */
 @Path("results")
 public class ResultsRS {
@@ -124,7 +123,6 @@ public class ResultsRS {
     }
 
     /**
-     * TODO no funciona para TTT. No existe columna team, y ademas van tras cada
      * equipo (con su puesto) todos los ciclistas que tomaron parte (sin puesto)
      * Habria que pasar de los que no tienen rank
      * 

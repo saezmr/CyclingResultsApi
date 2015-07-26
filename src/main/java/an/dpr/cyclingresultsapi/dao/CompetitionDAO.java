@@ -19,8 +19,6 @@ public interface CompetitionDAO {
     
     List<Competition> getYearCompetitions(Integer year);
     
-    List<Competition> getYearByClass(Integer year);
-
     Competition save(Competition Competition);
 
     void delete(Long CompetitionId);

@@ -60,9 +60,9 @@ public class Competition {
     private String name;
     private Date initDate;
     private Date finishDate;
-    private String nationality;// TODO ENUM!!
-    private CompetitionClass competitionClass;// TODO ENUM!!
-    private String category;// TODO ENUM!!
+    private String nationality;
+    private CompetitionClass competitionClass;
+    private String category;
     private String classificationName;//general, puntos, etapa 3...
     private CompetitionType competitionType;
 

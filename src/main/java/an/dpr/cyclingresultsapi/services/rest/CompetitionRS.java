@@ -56,9 +56,6 @@ import an.dpr.cyclingresultsapi.util.Utils;
  *         
  * Todo el calendario: http://www.uci.ch/road/calendar/
  * TODO LIST:
- * 	-find by gender (male, female)
- * 	-find by class (elite, sub23..)
- * 	-find by competitionClass (WT, hc1, 1.1...)
  * 	-find by category (world, europe, asia ...) 
  */
 
@@ -317,7 +314,6 @@ public class CompetitionRS {
 
     /**
      * Last competitions finished or in course.
-     * TODO estamos teniendo un problema, no carga una comptitionid para años distintos!!
      * @param initDate and finishDate in format yyyymmdd
      * @return List<Competition>
      */
@@ -359,8 +355,6 @@ public class CompetitionRS {
     }
     
     /*
-     * TODO tenemos un tema con los campeonatos nacionales porque se marcan como "stages" al tener
-     * fechas ini y fin no iguales, pero realmente no tienen stages!!
      */
     private void loadAndSaveStageCompetitions(String initDate, String finishDate) throws ParseException, CyclingResultsException {
 	Date init = DateUtil.parse(initDate, Contracts.DATE_FORMAT_SEARCH_COMPS);

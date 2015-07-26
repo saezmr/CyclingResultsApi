@@ -10,10 +10,6 @@ import an.dpr.cyclingresultsapi.bean.CompetitionType;
 import an.dpr.cyclingresultsapi.domain.Competition;
 
 /**
- *  * TODO LIST:
- * 	-find by gender (male, female)
- * 	-find by class (elite, sub23..)
- * 	-find by competitionClass (WT, hc1, 1.1...) 
  * @author saez
  *
  */

@@ -57,12 +57,10 @@ public interface Contracts {
     public static final String PAGE_ID_STAGE_RACE = "19004";
 
     public static final String DATE_FORMAT_SEARCH_COMPS = "yyyyMMdd";
-    //TODO hacer editables startDateSort y endDateSort para poder cargar las competis que nos de la gana!! hay datos a millones!!!
     //estan todos los datos de la historia!!!
     public static final String ALL_COMPS = "http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19004&TaalCode=2&StyleID=0&SportID=102&CompetitionID=-1&EditionID=-1&EventID=-1"
     	+ "&GenderID="+GENDER_ID+"&ClassID="+CLASS_ID
-    	+ "&EventPhaseID=0&Phase1ID=0&Phase2ID=0&CompetitionCodeInv=1&PhaseStatusCode=262280&DerivedEventPhaseID=-1"
-    	+ "&SeasonID=488"//+SEASON_ID//TODO la sesion es irrelevante, lo qu emola es startdatesort y enddatesort
+    	+ "&EventPhaseID=0&Phase1ID=0&Phase2ID=0&CompetitionCodeInv=1&PhaseStatusCode=262280&DerivedEventPhaseID=-1&SeasonID=488"
     	+ "&StartDateSort="+INIT_DATE+"&EndDateSort="+FINISH_DATE
     	+ "&Detail=1&DerivedCompetitionID=-1&S00=-3&S01=2&S02=1&PageNr0=-1&Cache=8";
     //+"&PageNr0=-1"; para que se muestren todos los resultados y no solo la primer pagina (40 eventos)

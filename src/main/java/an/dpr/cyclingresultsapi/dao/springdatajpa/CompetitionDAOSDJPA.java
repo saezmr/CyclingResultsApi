@@ -76,12 +76,6 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
     }
 
     @Override
-    public List<Competition> getYearByClass(Integer year) {
-	// TODO Auto-generated method stub
-	throw new RuntimeException("Por implementar");
-    }
-
-    @Override
     public List<Competition> getCompetitions(Date time, Long genderID, Long classID, CompetitionClass cc) {
 	if (CompetitionClass.ALL.equals(cc)){
 	    log.debug("todos los tipso de competi");
