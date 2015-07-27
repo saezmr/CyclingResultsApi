@@ -11,6 +11,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,24 +47,31 @@ public class Competition {
     private Long id;
     private Long eventID;
     private Long editionID;//Id de la edicion para un mismo evento (tour 2012, 2013...)
+    @JsonIgnore
     private Long seasonID;
     private Long competitionID;
     private Long eventPhaseID;
     private Long phaseClassificationID;//nos indica con -1 si es general 
     private Long phase1ID;//si eventphaseId = 0, y phase1id = 0, indica general.
+    @JsonIgnore
     private Long phase2ID;
+    @JsonIgnore
     private Long phase3ID;
     private Long genderID;// 1 men 2 women
     private Long classID;// elite 2 junior 101 sub23
+    @JsonIgnore
     private Long pageID;
+    @JsonIgnore
     private Long sportID;//102 road
     private String name;
     private Date initDate;
     private Date finishDate;
     private String nationality;
     private CompetitionClass competitionClass;
+    @JsonIgnore
     private String category;
-    private String classificationName;//general, puntos, etapa 3...
+    @JsonIgnore
+    private String classificationName;//TODO a eliminar
     private CompetitionType competitionType;
 
     //stages race list info
@@ -178,11 +186,13 @@ public class Competition {
 	this.eventPhaseID = eventPhaseID;
     }
 
+    @JsonIgnore
     @Column
     public String getCategory() {
 	return category;
     }
 
+    @JsonIgnore
     public void setCategory(String category) {
 	this.category = category;
     }
@@ -215,38 +225,46 @@ public class Competition {
         phase1ID = phase1id;
     }
 
+    @JsonIgnore
     @Column
     public Long getPhase2ID() {
         return phase2ID;
     }
 
+    @JsonIgnore
     public void setPhase2ID(Long phase2id) {
         phase2ID = phase2id;
     }
 
+    @JsonIgnore
     @Column
     public Long getPhase3ID() {
         return phase3ID;
     }
 
+    @JsonIgnore
     public void setPhase3ID(Long phase3id) {
         phase3ID = phase3id;
     }
 
+    @JsonIgnore
     @Column
     public Long getPageID() {
         return pageID;
     }
 
+    @JsonIgnore
     public void setPageID(Long pageID) {
         this.pageID = pageID;
     }
 
+    @JsonIgnore
     @Column
     public Long getSportID() {
         return sportID;
     }
 
+    @JsonIgnore
     public void setSportID(Long sportID) {
         this.sportID = sportID;
     }
@@ -260,11 +278,13 @@ public class Competition {
 		+ ", competitionClass=" + competitionClass + ", competitionType=" + competitionType + "]";
     }
 
+    @JsonIgnore
     @Column
     public String getClassificationName() {
         return classificationName;
     }
 
+    @JsonIgnore
     public void setClassificationName(String classificationName) {
         this.classificationName = classificationName;
     }
@@ -286,11 +306,13 @@ public class Competition {
         this.competitionType = competitionType;
     }
 
+    @JsonIgnore
     @Column
     public Long getSeasonID() {
         return seasonID;
     }
 
+    @JsonIgnore
     public void setSeasonID(Long seasonID) {
         this.seasonID = seasonID;
     }

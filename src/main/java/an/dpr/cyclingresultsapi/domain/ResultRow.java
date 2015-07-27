@@ -9,20 +9,33 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
+
 @Entity
 @Table
 public class ResultRow {
 
+    @JsonProperty
     private String rank;
+    @JsonProperty
     private Long id;
+    @JsonProperty
     private String name;
+    @JsonProperty
     private String nat;
+    @JsonProperty
     private String team;
+    @JsonProperty
     private String age;
+    @JsonProperty
     private String result;
+    @JsonProperty
     private String paR;
+    @JsonProperty
     private String pcR;
     //only for persistence
+    @JsonIgnore
     private Competition competition;
     
     @Id
@@ -36,11 +49,13 @@ public class ResultRow {
 	this.id=id;
     }
     
+    @JsonIgnore
     @ManyToOne(fetch=FetchType.EAGER)
     public Competition getCompetition(){
 	return competition;
     }
-
+    
+    @JsonIgnore
     public void setCompetition(Competition competition){
 	this.competition=competition;
     }
