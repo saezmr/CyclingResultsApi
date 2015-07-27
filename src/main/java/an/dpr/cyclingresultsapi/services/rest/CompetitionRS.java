@@ -367,9 +367,9 @@ public class CompetitionRS {
      * fechas ini y fin no iguales, pero realmente no tienen stages!!
      */
     private void loadAndSaveStageCompetitions(String initDate, String finishDate) throws ParseException, CyclingResultsException {
-	Date init = DateUtil.parse(initDate, DateUtil.DDMMYYYY);
+	Date init = DateUtil.parse(initDate, Contracts.DATE_FORMAT_SEARCH_COMPS);
 	Calendar cal = Calendar.getInstance();
-	cal.setTime(DateUtil.parse(finishDate, DateUtil.DDMMYYYY));
+	cal.setTime(DateUtil.parse(finishDate, Contracts.DATE_FORMAT_SEARCH_COMPS));
 	Date fin = cal.getTime(); 
 	List<Competition> competitions = dao.getCompetitions(init, fin,
 		CompetitionType.STAGES);
@@ -405,9 +405,14 @@ public class CompetitionRS {
 	if (CompetitionType.STAGES.equals(comp.getCompetitionType())){
 	    if (dao.getCompetitionClassifications(comp).size()==0 || dao.getCompetitionStages(comp).size()==0){
 		ret = true;
+		log.debug("needLoad "+comp);
 	    } else if (!competitionFinalizada(comp)){
 		ret = true;
+		log.debug("needReLoad "+comp);
+	    } else {
+		log.debug("not load "+comp);
 	    }
+	    
 	}
 	return ret;
     }
@@ -519,11 +524,6 @@ public class CompetitionRS {
 	//log.debug(ret.toString());
 	List<Competition> list = tratarXmlCompetitions(ret.toString());
 	log.info(list.size()+" competitions load, genderID="+genderID+", classID="+classID+", initDate="+initDate+",finDate="+finishDate);
-    }
-    
-    public static void main(String...args){
-	CompetitionRS c = new CompetitionRS();
-	System.out.println(c.getURLCompetitions("1","1","20130101","20131231"));
     }
     
     private String getURLCompetitions(String genderID, String classID, String initDate, String finishDate) {

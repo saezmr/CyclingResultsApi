@@ -253,14 +253,11 @@ public class Competition {
 
     @Override
     public String toString() {
-	return "Competition [id=" + id + ", eventID=" + eventID + ", editionID=" + editionID + ", seasonID=" + seasonID
+	return "Competition [id=" + id + ", eventID=" + eventID + ", editionID=" + editionID 
 		+ ", competitionID=" + competitionID + ", eventPhaseID=" + eventPhaseID + ", phaseClassificationID="
-		+ phaseClassificationID + ", phase1ID=" + phase1ID + ", phase2ID=" + phase2ID + ", phase3ID="
-		+ phase3ID + ", genderID=" + genderID + ", classID=" + classID + ", pageID=" + pageID + ", sportID="
-		+ sportID + ", name=" + name + ", initDate=" + initDate + ", finishDate=" + finishDate
-		+ ", nationality=" + nationality + ", competitionClass=" + competitionClass + ", category=" + category
-		+ ", classificationName=" + classificationName + ", eventType=" + competitionType + ", winner=" + winner
-		+ ", leader=" + leader + "]";
+		+ phaseClassificationID + ", phase1ID=" + phase1ID + ", genderID=" + genderID 
+		+ ", classID=" + classID +", name=" + name + ", initDate=" + initDate + ", finishDate=" + finishDate
+		+ ", competitionClass=" + competitionClass + ", competitionType=" + competitionType + "]";
     }
 
     @Column
