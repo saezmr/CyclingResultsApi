@@ -49,7 +49,7 @@ import an.dpr.cyclingresultsapi.util.Contracts;
  *         
  *   //TODO FALTARIAN LAS CLASIFICACIONES GENERALES "COMPLEMENTARIAS", MONTAÑA, PUNTOS...
  */
-@Path("results")
+@Path("/results/")
 public class ResultsRS {
     private static final Logger log = LoggerFactory.getLogger(ResultsRS.class);
 
@@ -79,7 +79,7 @@ public class ResultsRS {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/oneDay/{competitionID},{eventID},{editionID},{genderID}, {classID}")
+    @Path("/oneDay/{competitionID},{eventID},{editionID},{genderID},{classID}")
     public List<ResultRow> getOneDayResult(
 	    @PathParam("competitionID") String competitionID,
 	    @PathParam("eventID") String eventID,
@@ -201,7 +201,7 @@ public class ResultsRS {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/stage/{competitionId},{eventID},{editionID],{genderID},{classID},{phase1ID}")
+    @Path("/stage/{competitionId},{eventID},{editionID},{genderID},{classID},{phase1ID}")
     public List<ResultRow> getStageResult(
 	    @PathParam("competitionId") String competitionID,
 	    @PathParam("eventID") String eventID,
@@ -239,7 +239,7 @@ public class ResultsRS {
 		Long.parseLong(phase1ID), Long.parseLong(phaseClassificationID));
 	List<ResultRow> list = rDao.getResults(comp);
 	if (list == null || list.size() == 0){
-	    String url = getURLStageResults(comp);
+	    String url = getURLClassificationResults(comp);
 	    list = readStageFromUCIWebResults(comp, url);
 	}
 	return list;
@@ -258,22 +258,37 @@ public class ResultsRS {
 	StringBuilder sb = new StringBuilder();
 	sb.append(Contracts.URL_STAGE_1)
 		.append(Contracts.URL_STAGE_EVENT_DATA
-			.replace(Contracts.SPORT_ID,
-				String.valueOf(comp.getSportID()))
 			.replace(Contracts.COMPETITION_ID,
 				String.valueOf(comp.getCompetitionID()))
 			.replace(Contracts.EDITION_ID,
 				String.valueOf(comp.getEditionID()))
-			.replace(Contracts.SEASON_ID,
-				String.valueOf(comp.getSeasonID()))
 			.replace(Contracts.EVENT_ID,
 				String.valueOf(comp.getEventID()))
 			.replace(Contracts.GENDER_ID,
 				String.valueOf(comp.getGenderID()))
 			.replace(Contracts.CLASS_ID,
-				String.valueOf(comp.getClassID())))
-		.append(Contracts.URL_STAGE_DATA.replace(Contracts.PHASE1_ID,
-			String.valueOf(comp.getPhase1ID())));
+				String.valueOf(comp.getClassID()))
+			)
+		.append(Contracts.URL_STAGE_DATA
+			.replace(Contracts.PHASE1_ID,String.valueOf(comp.getPhase1ID()))
+			);
+	return sb.toString();
+    }
+
+    private String getURLClassificationResults(Competition comp) {
+	StringBuilder sb = new StringBuilder();
+	sb.append(Contracts.CLASSIFICATIONS_URL
+		.replace(Contracts.COMPETITION_ID,
+			String.valueOf(comp.getCompetitionID()))
+		.replace(Contracts.EDITION_ID,
+			String.valueOf(comp.getEditionID()))
+		.replace(Contracts.EVENT_ID,
+			String.valueOf(comp.getEventID()))
+		.replace(Contracts.GENDER_ID,
+			String.valueOf(comp.getGenderID()))
+		.replace(Contracts.PHASE_CLASSIFICATION_ID,
+			String.valueOf(comp.getPhaseClassificationID()))
+		);
 	return sb.toString();
     }
     
