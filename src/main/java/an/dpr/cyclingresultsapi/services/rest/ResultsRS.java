@@ -237,10 +237,13 @@ public class ResultsRS {
 		Long.parseLong(eventID), Long.parseLong(editionID),
 		Long.parseLong(genderID), Long.parseLong(classID),
 		Long.parseLong(phase1ID), Long.parseLong(phaseClassificationID));
-	List<ResultRow> list = rDao.getResults(comp);
-	if (list == null || list.size() == 0){
-	    String url = getURLClassificationResults(comp);
-	    list = readStageFromUCIWebResults(comp, url);
+	List<ResultRow> list = null;
+	if (comp!= null){
+	    list = rDao.getResults(comp);
+	    if (list == null || list.size() == 0){
+		String url = getURLClassificationResults(comp);
+		list = readStageFromUCIWebResults(comp, url);
+	    }
 	}
 	return list;
     }
@@ -256,8 +259,7 @@ public class ResultsRS {
 
     private String getURLStageResults(Competition comp) {
 	StringBuilder sb = new StringBuilder();
-	sb.append(Contracts.URL_STAGE_1)
-		.append(Contracts.URL_STAGE_EVENT_DATA
+	sb.append(Contracts.STAGE_URL
 			.replace(Contracts.COMPETITION_ID,
 				String.valueOf(comp.getCompetitionID()))
 			.replace(Contracts.EDITION_ID,
@@ -268,8 +270,6 @@ public class ResultsRS {
 				String.valueOf(comp.getGenderID()))
 			.replace(Contracts.CLASS_ID,
 				String.valueOf(comp.getClassID()))
-			)
-		.append(Contracts.URL_STAGE_DATA
 			.replace(Contracts.PHASE1_ID,String.valueOf(comp.getPhase1ID()))
 			);
 	return sb.toString();
@@ -286,6 +286,8 @@ public class ResultsRS {
 			String.valueOf(comp.getEventID()))
 		.replace(Contracts.GENDER_ID,
 			String.valueOf(comp.getGenderID()))
+		.replace(Contracts.CLASS_ID,
+			String.valueOf(comp.getClassID()))
 		.replace(Contracts.PHASE_CLASSIFICATION_ID,
 			String.valueOf(comp.getPhaseClassificationID()))
 		);
