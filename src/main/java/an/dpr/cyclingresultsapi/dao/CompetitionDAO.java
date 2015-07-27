@@ -34,7 +34,7 @@ public interface CompetitionDAO {
      * @param eventID ->si hay varios tipos. Por ej TT y ruta.
      * @return
      */
-    Competition getCompetition(Long competitionID, Long eventID, Long genderID, Long classID, Long phase1ID);
+    Competition getCompetition(Long competitionID, Long eventID, Long editionID, Long genderID, Long classID, Long phase1ID);
     
     /**
      * Para clasificaciones, que añaden el phaseClassificationID
@@ -47,7 +47,7 @@ public interface CompetitionDAO {
      * @param long1 
      * @return
      */
-    Competition getCompetition(Long competitionID, Long eventID, Long editionId, Long genderID, Long classID, Long phase1ID, Long phaseClassificationID);
+    Competition getCompetition(Long competitionID, Long eventID, Long editionID, Long genderID, Long classID, Long phase1ID, Long phaseClassificationID);
     
     /**
      * Devuelve el listado de competitionos etapa de una competi 

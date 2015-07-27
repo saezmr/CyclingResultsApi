@@ -82,15 +82,16 @@ public class ResultsRS {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/oneDay/{competition_id},{eventID},{genderID}, {classID}")
+    @Path("/oneDay/{competitionID},{eventID},{editionID},{genderID}, {classID}")
     public List<ResultRow> getOneDayResult(
-	    @PathParam("competition_id") String competitionID,
+	    @PathParam("competitionID") String competitionID,
 	    @PathParam("eventID") String eventID,
+	    @PathParam("editionID") String editionID,
 	    @PathParam("genderID") String genderID,
 	    @PathParam("classID") String classID
 	    ) {
-	Competition comp = dao.getCompetition(Long.parseLong(competitionID),
-		Long.parseLong(eventID),Long.parseLong(genderID), Long.parseLong(classID),(long)-1);
+	Competition comp = dao.getCompetition(Long.parseLong(competitionID),Long.parseLong(eventID),
+		Long.parseLong(editionID), Long.parseLong(genderID), Long.parseLong(classID),(long)-1);
 	List<ResultRow> list = rDao.getResults(comp);
 	if (list == null || list.size() == 0){
 	    String url = getURLOneDayResults(comp);
@@ -203,15 +204,16 @@ public class ResultsRS {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/stage/{competitionId},{eventID},{genderID},{classID},{phase1ID}")
+    @Path("/stage/{competitionId},{eventID},{editionID],{genderID},{classID},{phase1ID}")
     public List<ResultRow> getStageResult(
 	    @PathParam("competitionId") String competitionID,
 	    @PathParam("eventID") String eventID,
+	    @PathParam("editionID") String editionID,
 	    @PathParam("genderID") String genderID,
 	    @PathParam("classID") String classID,
 	    @PathParam("phase1ID") String phase1ID) {
 	Competition comp = dao.getCompetition(Long.parseLong(competitionID),
-		Long.parseLong(eventID),
+		Long.parseLong(eventID),Long.parseLong(editionID),
 		Long.parseLong(genderID), Long.parseLong(classID),
 		Long.parseLong(phase1ID));
 	List<ResultRow> list = rDao.getResults(comp);

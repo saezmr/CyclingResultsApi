@@ -188,16 +188,18 @@ public class CompetitionRS {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/stageRaceCompetitions/{competitionID},{eventID},{genderID},{classID}")
+    @Path("/stageRaceCompetitions/{competitionID},{eventID},{editionID},{genderID},{classID}")
     public List<Competition> getStageRaceCompetitionsService(
 	    @PathParam("competitionID") String competitionID,
 	    @PathParam("eventID") String eventID,
+	    @PathParam("editionID") String editionID,
 	    @PathParam("genderID") String genderID,
 	    @PathParam("classID") String classID
 	    ) {
 	Competition comp = new Competition.Builder()
 		.setCompetitionID(Long.parseLong(competitionID)) 
 		.setEventID(Long.parseLong(eventID))
+		.setEditionID(Long.parseLong(editionID))
 		.setGenderID(Long.parseLong(genderID)) 
 		.setClassID(Long.parseLong(classID))
 		.build();
@@ -206,7 +208,7 @@ public class CompetitionRS {
 	list.addAll(dao.getCompetitionStages(comp));
 	if (list.size() == 0){//esto no deberia ocurrir, pero por si aca
 	    list = getStageRaceCompetitions(Long.parseLong(competitionID), Long.parseLong(eventID),
-		    Long.parseLong(genderID), Long.parseLong(classID));
+		    Long.parseLong(editionID), Long.parseLong(genderID), Long.parseLong(classID));
 	}
 	return list;
 	
@@ -221,10 +223,10 @@ public class CompetitionRS {
      * @return
      */
     public List<Competition> getStageRaceCompetitions(Long competitionID,
-	    Long eventID, Long genderID, Long classID ) {
+	    Long eventID, Long editionID, Long genderID, Long classID ) {
 	StringBuilder ret = new StringBuilder();
 	Competition competition = dao.getCompetition(competitionID,
-		eventID,genderID, classID, (long)-1);
+		eventID, editionID, genderID, classID, (long)-1);
 	try {
 //	    HttpClient client = new DefaultHttpClient();
 	    URI url = getURLStageEvents(competition);
@@ -232,7 +234,7 @@ public class CompetitionRS {
 //	    HttpResponse response = client.execute(get);
 //	    InputStreamReader isr = new InputStreamReader(response.getEntity()
 //		    .getContent(), "cp1252");
-	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/stageRaceEventsTour2014.htm";
+	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/stageRaceEventsTour2015.htm";
 	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
@@ -378,9 +380,8 @@ public class CompetitionRS {
 	    }//TODO ÑANA PRUEBAS solo le tour
 	    if(isNeedLoadStagesAndClassifications(comp)){
 		log.info("la competicion "+comp.getName()+" no esta cargada o finalizada, cargamos info");
-		List<Competition> stages = getStageRaceCompetitions(
-			comp.getCompetitionID(), comp.getEventID(),
-			comp.getGenderID(), comp.getClassID());
+		List<Competition> stages = getStageRaceCompetitions(comp.getCompetitionID(), comp.getEventID(),
+			comp.getEditionID(), comp.getGenderID(), comp.getClassID());
 		if (stages.size() > 0) {
 		    persistClassifications(stages.get(0));
 		    for (Competition stage : stages) {
@@ -480,7 +481,7 @@ public class CompetitionRS {
 //	    HttpGet get = new HttpGet(url);
 //	    HttpResponse response = client.execute(get);
 //	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");
-	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/tour2014General.htm";
+	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/tour2015General.htm";
 	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
@@ -507,7 +508,7 @@ public class CompetitionRS {
 //	    HttpResponse response = client.execute(get);
 //	    InputStreamReader isr = new InputStreamReader(response.getEntity()
 //		    .getContent(), "cp1252");
-	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResultsJulio2014.htm";
+	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResultsJulio2015.htm";
 	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
