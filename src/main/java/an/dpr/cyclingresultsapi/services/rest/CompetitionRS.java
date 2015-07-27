@@ -1,6 +1,8 @@
 package an.dpr.cyclingresultsapi.services.rest;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -224,14 +226,14 @@ public class CompetitionRS {
 	Competition competition = dao.getCompetition(competitionID,
 		eventID,genderID, classID, (long)-1);
 	try {
-	    HttpClient client = new DefaultHttpClient();
+//	    HttpClient client = new DefaultHttpClient();
 	    URI url = getURLStageEvents(competition);
-	    HttpGet get = new HttpGet(url);
-	    HttpResponse response = client.execute(get);
-	    InputStreamReader isr = new InputStreamReader(response.getEntity()
-		    .getContent(), "cp1252");
-//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/stageRaceCompetitions.htm";
-//	    FileReader isr = new FileReader(new File(file));
+//	    HttpGet get = new HttpGet(url);
+//	    HttpResponse response = client.execute(get);
+//	    InputStreamReader isr = new InputStreamReader(response.getEntity()
+//		    .getContent(), "cp1252");
+	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/stageRaceEventsTour2014.htm";
+	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {
@@ -363,14 +365,17 @@ public class CompetitionRS {
      * fechas ini y fin no iguales, pero realmente no tienen stages!!
      */
     private void loadAndSaveStageCompetitions(String initDate, String finishDate) throws ParseException, CyclingResultsException {
-	Date init = DateUtil.parse(initDate, Contracts.DATE_FORMAT_SEARCH_COMPS);
+	Date init = DateUtil.parse(initDate, DateUtil.DDMMYYYY);
 	Calendar cal = Calendar.getInstance();
-	cal.setTime(DateUtil.parse(finishDate, Contracts.DATE_FORMAT_SEARCH_COMPS));
-	cal.add(Calendar.DAY_OF_YEAR,1);
+	cal.setTime(DateUtil.parse(finishDate, DateUtil.DDMMYYYY));
 	Date fin = cal.getTime(); 
 	List<Competition> competitions = dao.getCompetitions(init, fin,
 		CompetitionType.STAGES);
 	for (Competition comp : competitions) {
+	    //TODO ÑANA PRUEBAS solo le tour
+	    if (!comp.getCompetitionID().equals(new Long(20433))){
+		continue;
+	    }//TODO ÑANA PRUEBAS solo le tour
 	    if(isNeedLoadStagesAndClassifications(comp)){
 		log.info("la competicion "+comp.getName()+" no esta cargada o finalizada, cargamos info");
 		List<Competition> stages = getStageRaceCompetitions(
@@ -416,7 +421,7 @@ public class CompetitionRS {
 	    cal.setTime(DateUtil.dateWithoutHour(comp.getFinishDate()));
 	    cal.add(Calendar.DAY_OF_YEAR, 1);
 	    Date finishDate = cal.getTime(); 
-	    return finishDate.after(new Date());
+	    return !finishDate.after(new Date());
 	} catch (ParseException e) {
 	    log.error("Error calculando fecha", e);
 	    return false;
@@ -470,13 +475,13 @@ public class CompetitionRS {
     private String readClassificationFromUCIWebResults(Competition comp){
 	StringBuilder ret = new StringBuilder();
 	try {
-	    HttpClient client = new DefaultHttpClient();// TODO DEPRECATED!
+//	    HttpClient client = new DefaultHttpClient();// TODO DEPRECATED!
 	    URI url = getURLClassifications(comp);
-	    HttpGet get = new HttpGet(url);
-	    HttpResponse response = client.execute(get);
-	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");
-//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/tour2015General.htm";
-//	    FileReader isr = new FileReader(new File(file));
+//	    HttpGet get = new HttpGet(url);
+//	    HttpResponse response = client.execute(get);
+//	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");
+	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/tour2014General.htm";
+	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {
@@ -496,14 +501,14 @@ public class CompetitionRS {
 	StringBuilder ret = new StringBuilder();
 	try {
 	    HttpClient client = new DefaultHttpClient();
-	    String url = getURLCompetitions(genderID, classID, initDate, finishDate);
-	    log.debug("URL:"+url);
-	    HttpGet get = new HttpGet(url);
-	    HttpResponse response = client.execute(get);
-	    InputStreamReader isr = new InputStreamReader(response.getEntity()
-		    .getContent(), "cp1252");
-//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResults.htm";
-//	    FileReader isr = new FileReader(new File(file));
+//	    String url = getURLCompetitions(genderID, classID, initDate, finishDate);
+//	    log.debug("URL:"+url);
+//	    HttpGet get = new HttpGet(url);
+//	    HttpResponse response = client.execute(get);
+//	    InputStreamReader isr = new InputStreamReader(response.getEntity()
+//		    .getContent(), "cp1252");
+	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResultsJulio2014.htm";
+	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {

@@ -110,15 +110,15 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
 
     @Override
     public List<Competition> getCompetitionStages(Competition competition) {
-	return repo.findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndCompetitionType(competition.getCompetitionID(),
-		competition.getEventID(), competition.getGenderID(), competition.getClassID(), 
+	return repo.findByCompetitionIDAndEventIDAndEditionIdAndGenderIDAndClassIDAndCompetitionType(competition.getCompetitionID(),
+		competition.getEventID(), competition.getEditionID(), competition.getGenderID(), competition.getClassID(), 
 		CompetitionType.STAGE_STAGES);
     }
 
     @Override
-    public List<Competition> getCompetitionClassifications(Competition competition) {
-	return repo.findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndCompetitionType(competition.getCompetitionID(),
-		competition.getEventID(), competition.getGenderID(), competition.getClassID(), 
+    public List<Competition> getCompetitionClassifications(Competition competition) {//TODO FALTA EDITION
+	return repo.findByCompetitionIDAndEventIDAndEditionIdAndGenderIDAndClassIDAndCompetitionType(competition.getCompetitionID(),
+		competition.getEventID(), competition.getEditionID(), competition.getGenderID(), competition.getClassID(), 
 		CompetitionType.CLASSIFICATION_STAGES);
     }
 
