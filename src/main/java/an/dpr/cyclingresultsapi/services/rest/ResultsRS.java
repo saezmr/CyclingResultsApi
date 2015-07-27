@@ -1,8 +1,6 @@
 package an.dpr.cyclingresultsapi.services.rest;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -32,7 +30,6 @@ import an.dpr.cyclingresultsapi.dao.ResultRowDAO;
 import an.dpr.cyclingresultsapi.domain.Competition;
 import an.dpr.cyclingresultsapi.domain.ResultRow;
 import an.dpr.cyclingresultsapi.util.Contracts;
-import an.dpr.cyclingresultsapi.util.Utils;
 
 /**
  * REST service for cycling results

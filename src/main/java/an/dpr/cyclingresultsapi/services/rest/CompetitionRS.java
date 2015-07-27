@@ -228,14 +228,14 @@ public class CompetitionRS {
 	Competition competition = dao.getCompetition(competitionID,
 		eventID, editionID, genderID, classID, (long)-1);
 	try {
-//	    HttpClient client = new DefaultHttpClient();
+	    HttpClient client = new DefaultHttpClient();
 	    URI url = getURLStageEvents(competition);
-//	    HttpGet get = new HttpGet(url);
-//	    HttpResponse response = client.execute(get);
-//	    InputStreamReader isr = new InputStreamReader(response.getEntity()
-//		    .getContent(), "cp1252");
-	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/stageRaceEventsTour2015.htm";
-	    FileReader isr = new FileReader(new File(file));
+	    HttpGet get = new HttpGet(url);
+	    HttpResponse response = client.execute(get);
+	    InputStreamReader isr = new InputStreamReader(response.getEntity()
+		    .getContent(), "cp1252");
+//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/stageRaceEventsTour2015.htm";
+//	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {
@@ -374,10 +374,6 @@ public class CompetitionRS {
 	List<Competition> competitions = dao.getCompetitions(init, fin,
 		CompetitionType.STAGES);
 	for (Competition comp : competitions) {
-	    //TODO ÑANA PRUEBAS solo le tour
-	    if (!comp.getCompetitionID().equals(new Long(20433))){
-		continue;
-	    }//TODO ÑANA PRUEBAS solo le tour
 	    if(isNeedLoadStagesAndClassifications(comp)){
 		log.info("la competicion "+comp.getName()+" no esta cargada o finalizada, cargamos info");
 		List<Competition> stages = getStageRaceCompetitions(comp.getCompetitionID(), comp.getEventID(),
@@ -476,13 +472,13 @@ public class CompetitionRS {
     private String readClassificationFromUCIWebResults(Competition comp){
 	StringBuilder ret = new StringBuilder();
 	try {
-//	    HttpClient client = new DefaultHttpClient();// TODO DEPRECATED!
+	    HttpClient client = new DefaultHttpClient();// TODO DEPRECATED!
 	    URI url = getURLClassifications(comp);
-//	    HttpGet get = new HttpGet(url);
-//	    HttpResponse response = client.execute(get);
-//	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");
-	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/tour2015General.htm";
-	    FileReader isr = new FileReader(new File(file));
+	    HttpGet get = new HttpGet(url);
+	    HttpResponse response = client.execute(get);
+	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");
+//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/tour2015General.htm";
+//	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {
@@ -502,14 +498,14 @@ public class CompetitionRS {
 	StringBuilder ret = new StringBuilder();
 	try {
 	    HttpClient client = new DefaultHttpClient();
-//	    String url = getURLCompetitions(genderID, classID, initDate, finishDate);
-//	    log.debug("URL:"+url);
-//	    HttpGet get = new HttpGet(url);
-//	    HttpResponse response = client.execute(get);
-//	    InputStreamReader isr = new InputStreamReader(response.getEntity()
-//		    .getContent(), "cp1252");
-	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResultsJulio2015.htm";
-	    FileReader isr = new FileReader(new File(file));
+	    String url = getURLCompetitions(genderID, classID, initDate, finishDate);
+	    log.debug("URL:"+url);
+	    HttpGet get = new HttpGet(url);
+	    HttpResponse response = client.execute(get);
+	    InputStreamReader isr = new InputStreamReader(response.getEntity()
+		    .getContent(), "cp1252");
+//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResultsJulio2015.htm";
+//	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
 	    while ((line = br.readLine()) != null) {
@@ -523,6 +519,11 @@ public class CompetitionRS {
 	//log.debug(ret.toString());
 	List<Competition> list = tratarXmlCompetitions(ret.toString());
 	log.info(list.size()+" competitions load, genderID="+genderID+", classID="+classID+", initDate="+initDate+",finDate="+finishDate);
+    }
+    
+    public static void main(String...args){
+	CompetitionRS c = new CompetitionRS();
+	System.out.println(c.getURLCompetitions("1","1","20130101","20131231"));
     }
     
     private String getURLCompetitions(String genderID, String classID, String initDate, String finishDate) {
