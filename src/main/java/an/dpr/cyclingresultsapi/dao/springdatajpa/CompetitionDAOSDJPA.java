@@ -29,7 +29,12 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
 
     @Override
     public Competition save(Competition comp) {
-	return repo.save(comp);
+	try{
+	    return repo.save(comp);
+	} catch(Exception e){
+	    log.error("Error persisitiendo "+comp, e);
+	    return comp;
+	}
     }
 
     @Override
