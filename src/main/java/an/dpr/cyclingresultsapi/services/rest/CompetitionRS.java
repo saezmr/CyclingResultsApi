@@ -1,6 +1,8 @@
 package an.dpr.cyclingresultsapi.services.rest;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -183,16 +185,18 @@ public class CompetitionRS {
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/stageRaceCompetitions/{competitionID},{eventID},{genderID},{classID}")
+    @Path("/stageRaceCompetitions/{competitionID},{eventID},{editionID},{genderID},{classID}")
     public List<Competition> getStageRaceCompetitionsService(
 	    @PathParam("competitionID") String competitionID,
 	    @PathParam("eventID") String eventID,
+	    @PathParam("editionID") String editionID,
 	    @PathParam("genderID") String genderID,
 	    @PathParam("classID") String classID
 	    ) {
 	Competition comp = new Competition.Builder()
 		.setCompetitionID(Long.parseLong(competitionID)) 
 		.setEventID(Long.parseLong(eventID))
+		.setEditionID(Long.parseLong(editionID))
 		.setGenderID(Long.parseLong(genderID)) 
 		.setClassID(Long.parseLong(classID))
 		.build();
@@ -201,7 +205,7 @@ public class CompetitionRS {
 	list.addAll(dao.getCompetitionStages(comp));
 	if (list.size() == 0){//esto no deberia ocurrir, pero por si aca
 	    list = getStageRaceCompetitions(Long.parseLong(competitionID), Long.parseLong(eventID),
-		    Long.parseLong(genderID), Long.parseLong(classID));
+		    Long.parseLong(editionID), Long.parseLong(genderID), Long.parseLong(classID));
 	}
 	return list;
 	
@@ -216,10 +220,10 @@ public class CompetitionRS {
      * @return
      */
     public List<Competition> getStageRaceCompetitions(Long competitionID,
-	    Long eventID, Long genderID, Long classID ) {
+	    Long eventID, Long editionID, Long genderID, Long classID ) {
 	StringBuilder ret = new StringBuilder();
 	Competition competition = dao.getCompetition(competitionID,
-		eventID,genderID, classID, (long)-1);
+		eventID, editionID, genderID, classID, (long)-1);
 	try {
 	    HttpClient client = new DefaultHttpClient();
 	    URI url = getURLStageEvents(competition);
@@ -227,7 +231,7 @@ public class CompetitionRS {
 	    HttpResponse response = client.execute(get);
 	    InputStreamReader isr = new InputStreamReader(response.getEntity()
 		    .getContent(), "cp1252");
-//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/stageRaceCompetitions.htm";
+//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/stageRaceEventsTour2015.htm";
 //	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;
@@ -360,16 +364,14 @@ public class CompetitionRS {
 	Date init = DateUtil.parse(initDate, Contracts.DATE_FORMAT_SEARCH_COMPS);
 	Calendar cal = Calendar.getInstance();
 	cal.setTime(DateUtil.parse(finishDate, Contracts.DATE_FORMAT_SEARCH_COMPS));
-	cal.add(Calendar.DAY_OF_YEAR,1);
 	Date fin = cal.getTime(); 
 	List<Competition> competitions = dao.getCompetitions(init, fin,
 		CompetitionType.STAGES);
 	for (Competition comp : competitions) {
 	    if(isNeedLoadStagesAndClassifications(comp)){
 		log.info("la competicion "+comp.getName()+" no esta cargada o finalizada, cargamos info");
-		List<Competition> stages = getStageRaceCompetitions(
-			comp.getCompetitionID(), comp.getEventID(),
-			comp.getGenderID(), comp.getClassID());
+		List<Competition> stages = getStageRaceCompetitions(comp.getCompetitionID(), comp.getEventID(),
+			comp.getEditionID(), comp.getGenderID(), comp.getClassID());
 		if (stages.size() > 0) {
 		    persistClassifications(stages.get(0));
 		    for (Competition stage : stages) {
@@ -397,9 +399,14 @@ public class CompetitionRS {
 	if (CompetitionType.STAGES.equals(comp.getCompetitionType())){
 	    if (dao.getCompetitionClassifications(comp).size()==0 || dao.getCompetitionStages(comp).size()==0){
 		ret = true;
+		log.debug("needLoad "+comp);
 	    } else if (!competitionFinalizada(comp)){
 		ret = true;
+		log.debug("needReLoad "+comp);
+	    } else {
+		log.debug("not load "+comp);
 	    }
+	    
 	}
 	return ret;
     }
@@ -410,7 +417,7 @@ public class CompetitionRS {
 	    cal.setTime(DateUtil.dateWithoutHour(comp.getFinishDate()));
 	    cal.add(Calendar.DAY_OF_YEAR, 1);
 	    Date finishDate = cal.getTime(); 
-	    return finishDate.after(new Date());
+	    return !finishDate.after(new Date());
 	} catch (ParseException e) {
 	    log.error("Error calculando fecha", e);
 	    return false;
@@ -496,7 +503,7 @@ public class CompetitionRS {
 	    HttpResponse response = client.execute(get);
 	    InputStreamReader isr = new InputStreamReader(response.getEntity()
 		    .getContent(), "cp1252");
-//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResults.htm";
+//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResultsJulio2015.htm";
 //	    FileReader isr = new FileReader(new File(file));
 	    BufferedReader br = new BufferedReader(isr);
 	    String line;

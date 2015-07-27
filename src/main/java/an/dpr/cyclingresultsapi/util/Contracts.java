@@ -67,8 +67,16 @@ public interface Contracts {
     //stage results url
     public static final String ALL_RESULTS = "&S00=1&S01=2&S02=3&PageNr0=-1";
     public static final String URL_STAGE_1="http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19006&CompetitionCodeInv=1&Phase2ID=0&Phase3ID=0&DerivedEventPhaseID=-1&Detail=1&Ranking=0"+ALL_RESULTS;
-    public static final String URL_STAGE_EVENT_DATA="&SportID=SPORT_ID&CompetitionID=COMPETITION_ID&EditionID=EDITION_ID&SeasonID=SEASON_ID&EventID=EVENT_ID&GenderID=GENDER_ID&ClassID=CLASS_ID";
+    public static final String URL_STAGE_EVENT_DATA="&SportID=SPORT_ID&CompetitionID=COMPETITION_ID&EditionID=EDITION_ID&EventID=EVENT_ID&GenderID=GENDER_ID&ClassID=CLASS_ID";
     public static final String URL_STAGE_DATA="&Phase1ID=PHASE1_ID";
+    
+    public static final String STAGE_URL = "http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19006&TaalCode=2&StyleID=0&SportID=102"
+	    + "&CompetitionID="+COMPETITION_ID+"&EditionID="+EDITION_ID+"&EventID="+EVENT_ID+"&GenderID="+GENDER_ID+"&ClassID="+CLASS_ID+"&Phase1ID="+PHASE1_ID
+    	+ "&PhaseStatusCode=262280&EventPhaseID=888255&Phase2ID=0&Phase3ID=0&PhaseClassificationID=-1&Detail=1&Ranking=0&DerivedEventPhaseID=-1&S00=1&S01=2&S02=3&PageNr0=-1&Cache=8";
+    
+    public static final String CLASSIFICATIONS_URL = "http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19006&TaalCode=2&StyleID=0&SportID=102"
+    	+ "&CompetitionID="+COMPETITION_ID+"&EditionID="+EDITION_ID+"&EventID="+EVENT_ID+"&GenderID="+GENDER_ID+"&ClassID="+CLASS_ID+"&PhaseClassificationID="+PHASE_CLASSIFICATION_ID
+    	+ "&PhaseStatusCode=262280&EventPhaseID=999182&Phase1ID=0&Phase2ID=0&Phase3ID=0&Detail=1&Ranking=0&DerivedEventPhaseID=-1&S00=1&S01=2&S02=3&PageNr0=-1&Cache=8";
     
     //stage events url
     public static final String URL_STAGE_EVENTS_1 = "http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19004&Phase1ID=-1&Phase2ID=0&Phase3ID=0"

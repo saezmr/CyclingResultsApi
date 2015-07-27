@@ -43,9 +43,9 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
     }
     
     @Override
-    public Competition getCompetition(Long competitionId, Long eventID, Long genderID, Long classID, Long phase1ID) {
-	List<Competition> list = repo.findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndPhase1ID(competitionId, 
-		eventID, genderID, classID, phase1ID);
+    public Competition getCompetition(Long competitionId, Long eventID, Long editionID, Long genderID, Long classID, Long phase1ID) {
+	List<Competition> list = repo.findByCompetitionIDAndEventIDAndEditionIDAndGenderIDAndClassIDAndPhase1ID(competitionId, 
+		eventID, editionID, genderID, classID, phase1ID);
 	if (list.size()>0){
 	    return list.get(0);
 	} else {
@@ -104,15 +104,15 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
 
     @Override
     public List<Competition> getCompetitionStages(Competition competition) {
-	return repo.findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndCompetitionType(competition.getCompetitionID(),
-		competition.getEventID(), competition.getGenderID(), competition.getClassID(), 
+	return repo.findByCompetitionIDAndEventIDAndEditionIDAndGenderIDAndClassIDAndCompetitionType(competition.getCompetitionID(),
+		competition.getEventID(), competition.getEditionID(), competition.getGenderID(), competition.getClassID(), 
 		CompetitionType.STAGE_STAGES);
     }
 
     @Override
-    public List<Competition> getCompetitionClassifications(Competition competition) {
-	return repo.findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndCompetitionType(competition.getCompetitionID(),
-		competition.getEventID(), competition.getGenderID(), competition.getClassID(), 
+    public List<Competition> getCompetitionClassifications(Competition competition) {//TODO FALTA EDITION
+	return repo.findByCompetitionIDAndEventIDAndEditionIDAndGenderIDAndClassIDAndCompetitionType(competition.getCompetitionID(),
+		competition.getEventID(), competition.getEditionID(), competition.getGenderID(), competition.getClassID(), 
 		CompetitionType.CLASSIFICATION_STAGES);
     }
 
