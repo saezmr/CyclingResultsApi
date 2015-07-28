@@ -16,7 +16,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,6 +29,7 @@ import an.dpr.cyclingresultsapi.dao.ResultRowDAO;
 import an.dpr.cyclingresultsapi.domain.Competition;
 import an.dpr.cyclingresultsapi.domain.ResultRow;
 import an.dpr.cyclingresultsapi.util.Contracts;
+import an.dpr.cyclingresultsapi.util.NetworkUtils;
 
 /**
  * REST service for cycling results
@@ -97,27 +97,20 @@ public class ResultsRS {
     }
     
     private List<ResultRow> readStageFromUCIWebResults(Competition comp, String url){
-	StringBuilder ret = new StringBuilder();
+	String htmlString = null;
 	try {
-	    HttpClient client = new DefaultHttpClient();// TODO DEPRECATED!
-
-	    HttpGet get = new HttpGet(url);
-	    HttpResponse response = client.execute(get);
-	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");
-//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/OneDayResult.htm";
-//	    FileReader isr = new FileReader(new File(file));
-	    BufferedReader br = new BufferedReader(isr);
-	    String line;
-	    while ((line = br.readLine()) != null) {
-		ret.append(line);
-	    }
+	    htmlString = NetworkUtils.getRequest(Contracts.BASE_URL_UCI, url);
 	} catch (ClientProtocolException e) {
 	    log.error("error leyendo info", e);
 	} catch (IOException e) {
 	    log.error("error leyendo info", e);
 	}
-	log.info(ret.toString());
-	return tratarXmlStageResult(ret.toString(), comp);
+	log.debug(htmlString);
+	if (htmlString != null){
+	    return tratarXmlStageResult(htmlString, comp);
+	} else {
+	    return new ArrayList<ResultRow>();
+	}
     }
 
     /**
@@ -275,21 +268,23 @@ public class ResultsRS {
 
     private String getURLClassificationResults(Competition comp) {
 	StringBuilder sb = new StringBuilder();
-	sb.append(Contracts.CLASSIFICATIONS_URL
-		.replace(Contracts.COMPETITION_ID,
-			String.valueOf(comp.getCompetitionID()))
-		.replace(Contracts.EDITION_ID,
-			String.valueOf(comp.getEditionID()))
-		.replace(Contracts.EVENT_ID,
-			String.valueOf(comp.getEventID()))
-		.replace(Contracts.GENDER_ID,
-			String.valueOf(comp.getGenderID()))
-		.replace(Contracts.CLASS_ID,
-			String.valueOf(comp.getClassID()))
-		.replace(Contracts.PHASE_CLASSIFICATION_ID,
-			String.valueOf(comp.getPhaseClassificationID()))
-		);
-	return sb.toString();
+   	sb.append(Contracts.CLASSIFICATIONS_URL
+   		.replace(Contracts.COMPETITION_ID,
+   			String.valueOf(comp.getCompetitionID()))
+   		.replace(Contracts.EDITION_ID,
+   			String.valueOf(comp.getEditionID()))
+   		.replace(Contracts.EVENT_ID,
+   			String.valueOf(comp.getEventID()))
+   		.replace(Contracts.GENDER_ID,
+   			String.valueOf(comp.getGenderID()))
+   		.replace(Contracts.CLASS_ID,
+   			String.valueOf(comp.getClassID()))
+   		.replace(Contracts.PHASE_CLASSIFICATION_ID,
+   			String.valueOf(comp.getPhaseClassificationID()))
+   		.replace(Contracts.EVENT_PHASE_ID,
+   			String.valueOf(comp.getEventPhaseID()))
+   		);
+   	return sb.toString();
     }
     
     private List<ResultRow> tratarXmlClassificationResult(String html, Competition comp) {

@@ -1,12 +1,6 @@
 package an.dpr.cyclingresultsapi.services.rest;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -19,11 +13,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -39,6 +29,7 @@ import an.dpr.cyclingresultsapi.domain.Competition;
 import an.dpr.cyclingresultsapi.exception.CyclingResultsException;
 import an.dpr.cyclingresultsapi.util.Contracts;
 import an.dpr.cyclingresultsapi.util.DateUtil;
+import an.dpr.cyclingresultsapi.util.NetworkUtils;
 import an.dpr.cyclingresultsapi.util.Utils;
 
 /**
@@ -200,7 +191,7 @@ public class CompetitionRS {
 		.setGenderID(Long.parseLong(genderID)) 
 		.setClassID(Long.parseLong(classID))
 		.build();
-	List<Competition> list = new ArrayList();
+	List<Competition> list = new ArrayList<Competition>();
 	list.addAll(dao.getCompetitionClassifications(comp));
 	list.addAll(dao.getCompetitionStages(comp));
 	if (list.size() == 0){//esto no deberia ocurrir, pero por si aca
@@ -221,35 +212,27 @@ public class CompetitionRS {
      */
     public List<Competition> getStageRaceCompetitions(Long competitionID,
 	    Long eventID, Long editionID, Long genderID, Long classID ) {
-	StringBuilder ret = new StringBuilder();
+	String htmlString = null;
 	Competition competition = dao.getCompetition(competitionID,
 		eventID, editionID, genderID, classID, (long)-1);
 	try {
-	    HttpClient client = new DefaultHttpClient();
-	    URI url = getURLStageEvents(competition);
-	    HttpGet get = new HttpGet(url);
-	    HttpResponse response = client.execute(get);
-	    InputStreamReader isr = new InputStreamReader(response.getEntity()
-		    .getContent(), "cp1252");
-//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/stageRaceEventsTour2015.htm";
-//	    FileReader isr = new FileReader(new File(file));
-	    BufferedReader br = new BufferedReader(isr);
-	    String line;
-	    while ((line = br.readLine()) != null) {
-		ret.append(line);
-	    }
+	    String url = getURLStageEvents(competition);
+	    htmlString = NetworkUtils.getRequest(Contracts.BASE_URL_UCI, url);
 	} catch (ClientProtocolException e) {
-	    log.error("error leyendo info ", e);
-	} catch (URISyntaxException e) {
 	    log.error("error leyendo info ", e);
 	} catch (IOException e) {
 	    log.error("error leyendo info ", e);
 	}
-	log.debug(ret.toString());
-	return tratarXmlStageRaceCompetitions(ret.toString(), competition);
+	log.debug(htmlString);
+	if (htmlString != null){
+	    return tratarXmlStageRaceCompetitions(htmlString, competition);
+	} else {
+	    return new ArrayList<Competition>();
+	}
+	 
     }
 
-    private URI getURLStageEvents(Competition competition) throws URISyntaxException {
+    private String getURLStageEvents(Competition competition) {
 	StringBuilder sb = new StringBuilder();
 	sb.append(Contracts.URL_STAGE_EVENTS_1);
 	sb.append(Contracts.URL_STAGE_EVENT_DATA
@@ -263,7 +246,7 @@ public class CompetitionRS {
 		.replace(Contracts.EVENT_PHASE_ID,competition.getEventPhaseID() !=null ? competition.getEventPhaseID().toString() : "-1")
 		);
 	
-	return new URI(sb.toString());
+	return sb.toString();
     }
 
     private List<Competition> tratarXmlStageRaceCompetitions(String html, Competition competition) {
@@ -288,6 +271,7 @@ public class CompetitionRS {
 			.setSportID(competition.getSportID())
 			.setCompetitionID(competition.getCompetitionID())
 			.setEventID(competition.getEventID())
+			.setEventPhaseID(competition.getEventPhaseID())
 			.setEditionID(competition.getEditionID())
 			.setSeasonID(competition.getSeasonID())
 			.setCompetitionID(competition.getCompetitionID())
@@ -300,20 +284,25 @@ public class CompetitionRS {
 	return list;
     }
     
-    private URI getURLClassifications(Competition comp) throws URISyntaxException{
-	StringBuilder sb = new StringBuilder();
-	sb.append(Contracts.URL_STAGE_1)
-	.append(Contracts.URL_STAGE_EVENT_DATA
-		.replace(Contracts.SPORT_ID, String.valueOf(comp.getSportID()))
-		.replace(Contracts.COMPETITION_ID, String.valueOf(comp.getCompetitionID()))
-		.replace(Contracts.EDITION_ID, String.valueOf(comp.getEditionID()))
-		.replace(Contracts.SEASON_ID, String.valueOf(comp.getSeasonID()))
-		.replace(Contracts.EVENT_ID, String.valueOf(comp.getEventID()))
-		.replace(Contracts.GENDER_ID, String.valueOf(comp.getGenderID()))
-		.replace(Contracts.CLASS_ID, String.valueOf(comp.getClassID()))
-		)
-	.append(Contracts.URL_STAGE_DATA.replace(Contracts.PHASE1_ID,Contracts.PHASE_1_ID_GENERAL_CLASSIFICATIONS.toString()));
-	return new URI(sb.toString());
+    private String getURLClassifications(Competition comp) {
+   	StringBuilder sb = new StringBuilder();
+   	sb.append(Contracts.CLASSIFICATIONS_URL
+   		.replace(Contracts.COMPETITION_ID,
+   			String.valueOf(comp.getCompetitionID()))
+   		.replace(Contracts.EDITION_ID,
+   			String.valueOf(comp.getEditionID()))
+   		.replace(Contracts.EVENT_ID,
+   			String.valueOf(comp.getEventID()))
+   		.replace(Contracts.GENDER_ID,
+   			String.valueOf(comp.getGenderID()))
+   		.replace(Contracts.CLASS_ID,
+   			String.valueOf(comp.getClassID()))
+   		.replace(Contracts.PHASE_CLASSIFICATION_ID,
+   			String.valueOf(-1))
+   		.replace(Contracts.EVENT_PHASE_ID,
+   			String.valueOf(comp.getEventPhaseID()))
+   		);
+   	return sb.toString();
     }
 
     /**
@@ -354,6 +343,47 @@ public class CompetitionRS {
 	} catch(Exception e){
 	    log.error("Error durante la carga de datos", e);
 	    ret = Boolean.FALSE;
+	}
+	return ret;
+    }
+    
+    /**
+     * Last competitions finished or in course.
+     * @param initDate and finishDate in format yyyymmdd
+     * @return List<Competition>
+     */
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/loadCompetitionDetails/{competitionID},{eventID},{editionID},{genderID},{classID}")
+    public Boolean loadCompetitionService(
+	    @PathParam("competitionID") String  competitionID,
+	    @PathParam("eventID") String eventID,
+	    @PathParam("editionID") String editionID,
+	    @PathParam("genderID") String  genderID,
+	    @PathParam("classID") String classID
+	    ) {
+	Boolean ret = false;
+	Competition comp = dao.getCompetition(Long.parseLong(competitionID), 
+		Long.parseLong(eventID), Long.parseLong(editionID), 
+		Long.parseLong(genderID), Long.parseLong(classID), Long.valueOf(-1));
+	if(isNeedLoadStagesAndClassifications(comp)){
+	    log.info("la competicion "+comp.getName()+" no esta cargada o finalizada, cargamos info");
+	    List<Competition> stages = getStageRaceCompetitions(comp.getCompetitionID(), comp.getEventID(),
+		    comp.getEditionID(), comp.getGenderID(), comp.getClassID());
+	    if (stages.size() > 0) {
+		persistClassifications(comp);
+		for (Competition stage : stages) {
+		    // comprobamos que no volvemos a guardar la general
+		    if (!stage.getPhase1ID().equals(Contracts.PHASE_1_ID_GENERAL_CLASSIFICATIONS)) {
+			stage.setCompetitionType(CompetitionType.STAGE_STAGES);
+			persistCompetition(stage);
+		    }
+		}
+	    }
+	    ret = true;
+	} else {
+	    log.info("la competicion "+comp.getName()+" SI esta cargada y finalizada, no realizamos la carga");
+	    ret = true;
 	}
 	return ret;
     }
@@ -438,86 +468,66 @@ public class CompetitionRS {
      */
     private List<Competition> getClassifications(Competition competition) {
 	List<Competition> classifications = new ArrayList<Competition>();
-	Document doc = Jsoup.parse(readClassificationFromUCIWebResults(competition));
-	Elements elements = doc.select("div.menu_item_tekst");
-	for(int i = 0;i<elements.size();i++){
-	    Element classification = elements.get(i);
-	    String name = competition.getName();
-	    if (!classification.text().trim().equals("General")){
-		name = name+" "+classification.text();
+	String html = readClassificationFromUCIWebResults(competition);
+	if (html != null) {
+	    Document doc = Jsoup.parse(html);
+	    Elements elements = doc.select("div.menu_item_tekst");
+	    for (int i = 0; i < elements.size(); i++) {
+		Element classification = elements.get(i);
+		String name = competition.getName();
+		if (!classification.text().trim().equals("General")) {
+		    name = name + " " + classification.text();
+		}
+		Competition compClass = new Competition.Builder()
+			.setInitDate(competition.getInitDate())
+			.setFinishDate(competition.getFinishDate())
+			.setName(name)
+			.setPhase1ID((long)0)
+			.setEventPhaseID(competition.getEventPhaseID())
+			.setPhaseClassificationID(
+				Utils.getKeyId(classification.toString(), Contracts.PHASE_CLASSIFICATION_ID_KEY))
+			.setSportID(competition.getSportID()).setCompetitionID(competition.getCompetitionID())
+			.setEventID(competition.getEventID()).setEditionID(competition.getEditionID())
+			.setSeasonID(competition.getSeasonID()).setCompetitionID(competition.getCompetitionID())
+			.setGenderID(competition.getGenderID()).setClassID(competition.getClassID())
+			.setCompetitionType(CompetitionType.CLASSIFICATION_STAGES).build();
+		classifications.add(compClass);
 	    }
-	    Competition compClass = new Competition.Builder()
-		.setInitDate(competition.getInitDate())
-		.setFinishDate(competition.getFinishDate())
-		.setName(name )
-		.setPhase1ID(competition.getPhase1ID())
-		.setPhaseClassificationID(Utils.getKeyId(classification.toString(), Contracts.PHASE_CLASSIFICATION_ID_KEY))
-		.setSportID(competition.getSportID())
-		.setCompetitionID(competition.getCompetitionID())
-		.setEventID(competition.getEventID())
-		.setEditionID(competition.getEditionID())
-		.setSeasonID(competition.getSeasonID())
-		.setCompetitionID(competition.getCompetitionID())
-		.setGenderID(competition.getGenderID())
-		.setClassID(competition.getClassID())
-		.setCompetitionType(CompetitionType.CLASSIFICATION_STAGES)
-		.build();
-	    classifications.add(compClass);
 	}
 	return classifications;
     }
     
     
     private String readClassificationFromUCIWebResults(Competition comp){
-	StringBuilder ret = new StringBuilder();
+	String ret = null;
 	try {
-	    HttpClient client = new DefaultHttpClient();// TODO DEPRECATED!
-	    URI url = getURLClassifications(comp);
-	    HttpGet get = new HttpGet(url);
-	    HttpResponse response = client.execute(get);
-	    InputStreamReader isr = new InputStreamReader(response.getEntity().getContent(), "cp1252");
-//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/tour2015General.htm";
-//	    FileReader isr = new FileReader(new File(file));
-	    BufferedReader br = new BufferedReader(isr);
-	    String line;
-	    while ((line = br.readLine()) != null) {
-		ret.append(line);
-	    }
+	    String url = getURLClassifications(comp);
+	    ret = NetworkUtils.getRequest(Contracts.BASE_URL_UCI, url);
 	} catch (ClientProtocolException e) {
 	    log.error("error leyendo info", e);
 	} catch (IOException e) {
 	    log.error("error leyendo info", e);
-	} catch (URISyntaxException e) {
-	    log.error("error leyendo info", e);
 	}
-	return ret.toString();
+	return ret;
     }
 
     private void loadCompetitions(String genderID, String classID, String initDate, String finishDate) {
-	StringBuilder ret = new StringBuilder();
+	String htmlString = null;
 	try {
-	    HttpClient client = new DefaultHttpClient();
 	    String url = getURLCompetitions(genderID, classID, initDate, finishDate);
-	    log.debug("URL:"+url);
-	    HttpGet get = new HttpGet(url);
-	    HttpResponse response = client.execute(get);
-	    InputStreamReader isr = new InputStreamReader(response.getEntity()
-		    .getContent(), "cp1252");
-//	    String file = "C:/Users/saez/workspace/andpr/CyclingResultsApi/html/RoadResultsJulio2015.htm";
-//	    FileReader isr = new FileReader(new File(file));
-	    BufferedReader br = new BufferedReader(isr);
-	    String line;
-	    while ((line = br.readLine()) != null) {
-		ret.append(line);
-	    }
+	    htmlString = NetworkUtils.getRequest(Contracts.BASE_URL_UCI, url);
 	} catch (ClientProtocolException e) {
 	    log.error("error leyendo info ", e);
 	} catch (IOException e) {
 	    log.error("error leyendo info ", e);
 	}
 	//log.debug(ret.toString());
-	List<Competition> list = tratarXmlCompetitions(ret.toString());
-	log.info(list.size()+" competitions load, genderID="+genderID+", classID="+classID+", initDate="+initDate+",finDate="+finishDate);
+	if (htmlString != null){
+	    List<Competition> list = tratarXmlCompetitions(htmlString);
+	    log.info(list.size()+" competitions load, genderID="+genderID+", classID="+classID+", initDate="+initDate+",finDate="+finishDate);
+	} else {
+	    log.info("no se encontro informacion");
+	}
     }
     
     private String getURLCompetitions(String genderID, String classID, String initDate, String finishDate) {

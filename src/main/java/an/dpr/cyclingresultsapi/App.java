@@ -48,3 +48,15 @@ public class App {
     }
 
 }
+
+/*
+ Rula
+http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19006&TaalCode=2&StyleID=0&SportID=102&CompetitionID=20695&EditionID=810688&EventID=12146&GenderID=1&ClassID=1&PhaseStatusCode=262280&EventPhaseID=810689&Phase1ID=0&Detail=1&Ranking=0&DerivedEventPhaseID=-1&S00=1&S01=2&S02=3&PageNr0=-1
+no
+http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19006&Phase2ID=0&Phase3ID=0&DerivedEventPhaseID=-1&Detail=1&Ranking=0&S00=1&S01=2&S02=3&PageNr0=-1&SportID=102&CompetitionID=20695&EditionID=810688&EventID=12146&GenderID=1&ClassID=1&Phase1ID=0
+
+
+TaalCode=2&StyleID=0&PhaseStatusCode=262280&EventPhaseID=810689
+
+CompetitionCodeInv=1
+*/
