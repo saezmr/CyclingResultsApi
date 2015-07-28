@@ -197,6 +197,10 @@ public class CompetitionRS {
 	if (list.size() == 0){//esto no deberia ocurrir, pero por si aca
 	    list = getStageRaceCompetitions(Long.parseLong(competitionID), Long.parseLong(eventID),
 		    Long.parseLong(editionID), Long.parseLong(genderID), Long.parseLong(classID));
+	    comp = dao.getCompetition(Long.parseLong(competitionID), 
+			Long.parseLong(eventID), Long.parseLong(editionID), 
+			Long.parseLong(genderID), Long.parseLong(classID), Long.valueOf(-1));
+	    persisistStagesCompetitionDetails(comp, list);
 	}
 	return list;
 	
@@ -370,16 +374,7 @@ public class CompetitionRS {
 	    log.info("la competicion "+comp.getName()+" no esta cargada o finalizada, cargamos info");
 	    List<Competition> stages = getStageRaceCompetitions(comp.getCompetitionID(), comp.getEventID(),
 		    comp.getEditionID(), comp.getGenderID(), comp.getClassID());
-	    if (stages.size() > 0) {
-		persistClassifications(comp);
-		for (Competition stage : stages) {
-		    // comprobamos que no volvemos a guardar la general
-		    if (!stage.getPhase1ID().equals(Contracts.PHASE_1_ID_GENERAL_CLASSIFICATIONS)) {
-			stage.setCompetitionType(CompetitionType.STAGE_STAGES);
-			persistCompetition(stage);
-		    }
-		}
-	    }
+	    persisistStagesCompetitionDetails(comp, stages);
 	    ret = true;
 	} else {
 	    log.info("la competicion "+comp.getName()+" SI esta cargada y finalizada, no realizamos la carga");
@@ -402,22 +397,26 @@ public class CompetitionRS {
 		log.info("la competicion "+comp.getName()+" no esta cargada o finalizada, cargamos info");
 		List<Competition> stages = getStageRaceCompetitions(comp.getCompetitionID(), comp.getEventID(),
 			comp.getEditionID(), comp.getGenderID(), comp.getClassID());
-		if (stages.size() > 0) {
-		    persistClassifications(stages.get(0));
-		    for (Competition stage : stages) {
-			// comprobamos que no volvemos a guardar la general
-			if (!stage.getPhase1ID().equals(Contracts.PHASE_1_ID_GENERAL_CLASSIFICATIONS)) {
-			    stage.setCompetitionType(CompetitionType.STAGE_STAGES);
-			    persistCompetition(stage);
-			}
-		    }
-		}
+		persisistStagesCompetitionDetails(comp, stages);
 	    } else {
 		log.info("la competicion "+comp.getName()+" SI esta cargada y finalizada, no realizamos la carga");
 	    }
 	}
     }
     
+    private void persisistStagesCompetitionDetails(Competition comp, List<Competition> stages) {
+	if (stages.size() > 0) {
+	    persistClassifications(comp);
+	    for (Competition stage : stages) {
+		// comprobamos que no volvemos a guardar la general
+		if (!stage.getPhase1ID().equals(Contracts.PHASE_1_ID_GENERAL_CLASSIFICATIONS)) {
+		    stage.setCompetitionType(CompetitionType.STAGE_STAGES);
+		    persistCompetition(stage);
+		}
+	    }
+	}
+    }
+
     /**
      *  
      * @return 
