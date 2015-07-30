@@ -84,7 +84,8 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
     public List<Competition> getCompetitions(Date time, Long genderID, Long classID, CompetitionClass cc) {
 	if (CompetitionClass.ALL.equals(cc)){
 	    log.debug("todos los tipso de competi");
-	    return repo.findByInitDateGreaterThanAndGenderIDAndClassIDAndCompetitionClassIsNotNull(time, genderID, classID);
+	    return repo.findByInitDateGreaterThanAndGenderIDAndClassIDAndPhase1IDAndCompetitionClassIsNotNullOrderByInitDateDesc(
+		    time, genderID, classID,(long)-1);
 	} else {
 	    log.debug("competis tipo "+cc);
 	    return repo.findByInitDateGreaterThanAndGenderIDAndClassIDAndCompetitionClass(time, genderID, classID, cc);
@@ -95,7 +96,8 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
     public List<Competition> getCompetitions(Date init, Date fin, Long genderID, Long classID, CompetitionClass cc) {
 	if (CompetitionClass.ALL.equals(cc)){
 	    log.debug("todos los tipso de competi");
-	    return repo.findByInitDateBetweenAndGenderIDAndClassID(init, fin, genderID, classID);
+	    return repo.findByInitDateBetweenAndGenderIDAndClassIDAndPhase1IDAndCompetitionClassIsNotNullOrderByInitDateDesc
+		    (init, fin, genderID, classID,(long)-1);
 	} else {
 	    log.debug("competis tipo "+cc);
 	    return repo.findByInitDateBetweenAndGenderIDAndClassIDAndCompetitionClass(init, fin, genderID, classID, cc);
@@ -109,7 +111,7 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
 
     @Override
     public List<Competition> getCompetitionStages(Competition competition) {
-	return repo.findByCompetitionIDAndEventIDAndEditionIDAndGenderIDAndClassIDAndCompetitionType(competition.getCompetitionID(),
+	return repo.findByCompetitionIDAndEventIDAndEditionIDAndGenderIDAndClassIDAndCompetitionTypeOrderByInitDateDesc(competition.getCompetitionID(),
 		competition.getEventID(), competition.getEditionID(), competition.getGenderID(), competition.getClassID(), 
 		CompetitionType.STAGE_STAGES);
     }

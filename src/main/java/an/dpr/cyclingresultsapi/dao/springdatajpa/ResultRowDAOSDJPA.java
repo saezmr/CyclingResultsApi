@@ -1,5 +1,6 @@
 package an.dpr.cyclingresultsapi.dao.springdatajpa;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -31,7 +32,9 @@ public class ResultRowDAOSDJPA extends BasicDAO implements ResultRowDAO {
 
     @Override
     public List<ResultRow> getResults(Competition competition) {
-	return repo.findByCompetition(competition);
+	List<ResultRow> list = repo.findByCompetition(competition);
+	Collections.sort(list);
+	return list;
     }
 
     @Override

@@ -24,7 +24,7 @@ public enum CompetitionClass {
 		break;
 	    }
 	}
-	return ret;
+	return ret != null ? ret : ALL;
     }
     
 }

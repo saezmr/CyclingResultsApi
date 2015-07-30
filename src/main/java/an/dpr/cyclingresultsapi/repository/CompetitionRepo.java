@@ -18,7 +18,7 @@ public interface CompetitionRepo  extends CrudRepository<Competition, Long> {
     
     List<Competition> findByInitDateGreaterThanAndGenderIDAndClassID(Date time, Long genderID, Long classID);
 
-    List<Competition> findByInitDateBetweenAndGenderIDAndClassID(Date init, Date fin, Long genderID, Long classID);
+    List<Competition> findByInitDateBetweenAndGenderIDAndClassIDAndPhase1IDAndCompetitionClassIsNotNullOrderByInitDateDesc(Date init, Date fin, Long genderID, Long classID, Long phase1ID);
 
     List<Competition> findByInitDateGreaterThanAndGenderIDAndClassIDAndCompetitionClass(Date time, Long genderID, Long classID, CompetitionClass cc);
     
@@ -42,14 +42,18 @@ public interface CompetitionRepo  extends CrudRepository<Competition, Long> {
     List<Competition> findByCompetitionIDAndEventIDAndGenderIDAndClassIDAndCompetitionType(Long competitionID,
 	    Long eventID, Long genderID, Long classID, CompetitionType type);
 
-    List<Competition> findByInitDateGreaterThanAndGenderIDAndClassIDAndCompetitionClassIsNotNull(Date time,
-	    Long genderID, Long classID);
+    List<Competition> findByInitDateGreaterThanAndGenderIDAndClassIDAndPhase1IDAndCompetitionClassIsNotNullOrderByInitDateDesc(Date time,
+	    Long genderID, Long classID, Long phase1ID);
 
     Competition findByCompetitionIDAndEventIDAndEditionIDAndGenderIDAndClassIDAndPhase1IDAndPhaseClassificationID(
 	    Long competitionId, Long eventID, Long editionID, Long genderID, Long classID, Long phase1id,
 	    Long phaseClassificationID);
 
     List<Competition> findByCompetitionIDAndEventIDAndEditionIDAndGenderIDAndClassIDAndCompetitionType(
+	    Long competitionID, Long eventID, Long editionID, Long genderID, Long classID,
+	    CompetitionType classificationStages);
+
+    List<Competition> findByCompetitionIDAndEventIDAndEditionIDAndGenderIDAndClassIDAndCompetitionTypeOrderByInitDateDesc(
 	    Long competitionID, Long eventID, Long editionID, Long genderID, Long classID,
 	    CompetitionType classificationStages);
 

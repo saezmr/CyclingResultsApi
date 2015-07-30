@@ -14,7 +14,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 @Entity
 @Table
-public class ResultRow {
+public class ResultRow implements Comparable<ResultRow> {
 
     @JsonProperty
     private String rank;
@@ -200,6 +200,29 @@ public class ResultRow {
     public String toString() {
 	return "OneDayResult [rank=" + rank + ", name=" + name + ", nat=" + nat + ", team=" + team + ", age=" + age
 		+ ", result=" + result + ", paR=" + paR + ", pcR=" + pcR + "]";
+    }
+
+    @Override
+    public int compareTo(ResultRow rr) {
+	Integer rrRank = null;
+	Integer thisRank = null;
+	try{rrRank = Integer.valueOf(rr.rank);} catch(Exception e){}
+	try{thisRank = Integer.valueOf(this.rank);} catch(Exception e){}
+	if (rrRank != null && thisRank != null){
+	    return thisRank.compareTo(rrRank);
+	} else if (thisRank != null){
+	    return -1;
+	} else if (rrRank != null){
+	    return 1;
+	} else if (this.rank != null && rr.rank != null){
+	    return this.rank.compareTo(rr.rank);
+	} else if (this.rank != null){
+	    return -1;
+	} else if (rr.rank != null){
+	    return 1;
+	} else {
+	    return 0;
+	}
     }
 
 }
