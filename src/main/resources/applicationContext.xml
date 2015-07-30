@@ -17,6 +17,8 @@
 	<!-- For Spring Data JPA -->
 	<import resource="classpath:repository-context.xml" />
 	<import resource="classpath:beans.xml" />
+	<import resource="classpath:spring-cron.xml"/>
+	
 	<!--  POSTGRES -->
 	<bean id="springConfiguredDataSource" class="org.postgresql.ds.PGSimpleDataSource">
 		<property name="databaseName" value="cyclingresultsdb" />

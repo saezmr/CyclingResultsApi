@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:task="http://www.springframework.org/schema/task"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                            http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+ 
+ 
+    <context:component-scan base-package="an.dpr.cyclingresultsapi.schedule" />
+ 	<!--
+ 	CRON: seconds (0-59), minute (0-59), hour (0-23, 0 = midnight), day (1-31), month (1-12), weekday (0-6, 0 = Sunday)
+ 	*/10 -> cada diez X se ejecutaria este campo 
+ 	 -->
+    <task:scheduled-tasks scheduler="loadDataScheduler">
+        <!-- Configuramos para dos cargas diaarias. 
+        	-18:30 hora española
+        	-6:00 hora española
+        rhcloud tiene 6 horas menos que españa -->
+        <task:scheduled ref="loadDataJob" method="loadLastCompetitions" cron="0 30 12 * * *" />
+        <task:scheduled ref="loadDataJob" method="loadLastCompetitions" cron="0 0 0 * * *" />
+    </task:scheduled-tasks>
+ 
+    <task:scheduler id="loadDataScheduler"/>
+ 
+</beans>
