@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +52,7 @@ public class CompetitionsBO {
 	    } else {
 		list = dao.getCompetitions(id, fd, getGenderID(genderID), getClassID(classID), getCompetitionClass(competitionClass));
 	    }
+	    Collections.sort(list);
 	} catch (ParseException e) {
 	    log.error("Error obteniendo competiciones", e);
 	}
@@ -156,6 +158,7 @@ public class CompetitionsBO {
 			Long.parseLong(genderID), Long.parseLong(classID), Long.valueOf(-1));
 	    persisistStagesCompetitionDetails(comp, list);
 	}
+	Collections.sort(list);
 	return list;
 	
     }

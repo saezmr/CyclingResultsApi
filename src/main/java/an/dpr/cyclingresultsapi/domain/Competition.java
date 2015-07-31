@@ -40,7 +40,7 @@ import an.dpr.cyclingresultsapi.util.DateUtil;
  */
 @Entity
 @Table
-public class Competition {
+public class Competition implements Comparable<Competition>{
 
     private static final Logger log = LoggerFactory.getLogger(Competition.class);
 
@@ -516,6 +516,15 @@ public class Competition {
 	    finishDate = date;
 	    return this;
 	}
+    }
+
+    @Override
+    public int compareTo(Competition c) {
+	int comp = this.finishDate.compareTo(c.finishDate)*-1;
+	if (comp == 0){
+	    comp = this.initDate.compareTo(c.initDate);
+	}
+	return comp;
     }
 
 
