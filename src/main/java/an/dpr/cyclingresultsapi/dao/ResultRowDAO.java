@@ -16,4 +16,6 @@ public interface ResultRowDAO {
     boolean competitionResultsExists(Competition competition);
     
     boolean resultRowExists(ResultRow rr);
+
+    void deleteCompetitionRows(Competition comp);
 }

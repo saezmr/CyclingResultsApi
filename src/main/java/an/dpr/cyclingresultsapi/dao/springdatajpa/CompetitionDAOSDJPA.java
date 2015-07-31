@@ -105,8 +105,8 @@ public class CompetitionDAOSDJPA extends BasicDAO implements CompetitionDAO {
     }
 
     @Override
-    public List<Competition> getCompetitions(Date init, Date fin, CompetitionType type) {
-	return repo.findByInitDateBetweenAndCompetitionType(init, fin, type);
+    public List<Competition> getCompetitions(Date init, Date fin, Long genderId, Long classId, CompetitionType type) {
+	return repo.getCompetitionsByDateAndCompetitionType(init, fin, type);
     }
 
     @Override

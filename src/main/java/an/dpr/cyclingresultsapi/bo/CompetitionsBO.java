@@ -15,7 +15,6 @@ import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.bean.CompetitionType;
@@ -39,6 +38,8 @@ public class CompetitionsBO {
     
     @Autowired
     private CompetitionDAO dao;
+    @Autowired
+    private ResultsBO resultsBO;
 
     public List<Competition> getCompetitions(String initDate,String finDate,String genderID,String classID,String competitionClass){
 	List<Competition> list = null;
@@ -291,7 +292,7 @@ public class CompetitionsBO {
 	    }
 	    if (ret){
 		//ahora cargaremos todas las "stage competitions" o clasificaicones internas de una prueba
-		loadAndSaveStageCompetitions(initDate, finishDate);
+		loadAndSaveStageCompetitions(genderID, classID, initDate, finishDate);
 	    }
 	    log.info("competitions load is finished "+genderID+","+classID+","+initDate+","+finishDate);
 	} catch(Exception e){
@@ -332,13 +333,12 @@ public class CompetitionsBO {
     
     /*
      */
-    private void loadAndSaveStageCompetitions(String initDate, String finishDate) throws ParseException, CyclingResultsException {
+    private void loadAndSaveStageCompetitions(String genderID, String classID, String initDate, String finishDate) throws ParseException, CyclingResultsException {
 	Date init = DateUtil.parse(initDate, Contracts.DATE_FORMAT_SEARCH_COMPS);
 	Calendar cal = Calendar.getInstance();
 	cal.setTime(DateUtil.parse(finishDate, Contracts.DATE_FORMAT_SEARCH_COMPS));
 	Date fin = cal.getTime(); 
-	List<Competition> competitions = dao.getCompetitions(init, fin,
-		CompetitionType.STAGES);
+	List<Competition> competitions = dao.getCompetitions(init, fin,Long.parseLong(genderID), Long.parseLong(classID), CompetitionType.STAGES);
 	for (Competition comp : competitions) {
 	    if(isNeedLoadStagesAndClassifications(comp)){
 		log.info("la competicion "+comp.getName()+" no esta cargada o finalizada, cargamos info");
@@ -404,6 +404,18 @@ public class CompetitionsBO {
 	List<Competition> classifications = getClassifications(stage);
 	for(Competition classification : classifications){
 	    persistCompetition(classification);
+	    reloadClassificationResults(classification);
+	}
+    }
+
+    private void reloadClassificationResults(Competition classification) {
+	Competition comp = dao.getCompetition(classification.getCompetitionID(),
+		classification.getEventID(), classification.getEditionID(),
+		classification.getGenderID(), classification.getClassID(),
+		classification.getPhase1ID(), classification.getPhaseClassificationID());
+	
+	if (!competitionFinalizada(comp) && resultsBO.tieneResultados(comp)){//recargamos los resultados
+	    resultsBO.reloadClassification(comp);
 	}
     }
 

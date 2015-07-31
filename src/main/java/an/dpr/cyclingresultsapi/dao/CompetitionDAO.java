@@ -13,7 +13,7 @@ public interface CompetitionDAO {
 
     List<Competition> getCompetitions(Date init, Date fin, Long genderID, Long classID, CompetitionClass cc);
     
-    List<Competition> getCompetitions(Date init, Date fin, CompetitionType type);
+    List<Competition> getCompetitions(Date init, Date fin, Long genderID, Long classID,  CompetitionType type);
 
     List<Competition> getCompetitionsBetweenDates(Date init, Date fin);
     

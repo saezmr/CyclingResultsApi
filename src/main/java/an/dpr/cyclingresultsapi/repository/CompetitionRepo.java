@@ -3,7 +3,9 @@ package an.dpr.cyclingresultsapi.repository;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.bean.CompetitionType;
@@ -14,7 +16,15 @@ import an.dpr.cyclingresultsapi.domain.Competition;
  *
  */
 public interface CompetitionRepo  extends CrudRepository<Competition, Long> {
+    
+    String GET_COMPETITIONS_BY_DATES_AND_TYPE = "FROM Competition c "
+    	+ "WHERE c.phase1ID < 0 AND c.competitionType = :competitionType AND "
+    	+ "( c.initDate BETWEEN :initDate AND :finishDate "
+    	+ "OR finishDate BETWEEN :initDate AND :finishDate "
+    	+ "OR (finishDate > :finishDate AND initDate < :initDate) )";
 
+    @Query(GET_COMPETITIONS_BY_DATES_AND_TYPE)
+    List<Competition> getCompetitionsByDateAndCompetitionType(@Param("initDate") Date initDate, @Param("finishDate")Date finishDate, @Param("competitionType") CompetitionType competitionType);
     
     List<Competition> findByInitDateGreaterThanAndGenderIDAndClassID(Date time, Long genderID, Long classID);
 

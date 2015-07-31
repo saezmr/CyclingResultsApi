@@ -188,6 +188,16 @@ public class ResultsBO {
 	return list;
     }
     
+    public List<ResultRow> reloadClassification(Competition comp){
+	rDao.deleteCompetitionRows(comp);	
+	String url = getURLClassificationResults(comp);
+	return readStageFromUCIWebResults(comp, url);
+    }
+    
+    public boolean tieneResultados(Competition comp){
+	return rDao.getResults(comp).size()>0;
+    }
+    
     private String getURLOneDayResults(Competition comp) {
 	String url = ONE_DAY_RESULTS_URL
 		.replace(Contracts.COMPETITION_ID, comp.getCompetitionID().toString())
