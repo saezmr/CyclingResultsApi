@@ -18,6 +18,7 @@ public interface Contracts {
     public static final String SEASON_2011="480";
     public static final String SEASON_2010="478";
     public static final String SEASON_2009="476";
+    public static final String IN_PROGRESS_FLAG="progress";
     
     
     //KEYS DE LA UCI

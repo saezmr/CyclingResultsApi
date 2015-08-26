@@ -48,8 +48,9 @@ public class ResultRowDAOSDJPA extends BasicDAO implements ResultRowDAO {
 
     @Override
     public boolean resultRowExists(ResultRow rr) {
-	ResultRow result = repo.findByRankAndCompetition(rr.getRank(), rr.getCompetition());
-	return result != null;
+	//TODO MODIFICAR ESTO, rank no es PK, puede haber varios DNF, DQS...
+	//ResultRow result = repo.findByRankAndCompetition(rr.getRank(), rr.getCompetition());
+	return false;//result != null;
     }
 
     @Override

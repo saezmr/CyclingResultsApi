@@ -86,7 +86,7 @@ public class CompetitionsBO {
     private Date getDate(String cadena, boolean nullable) throws ParseException {
 	Date ret = null;
 	if (cadena == null || cadena.isEmpty()) {
-	    //fecha por defecto 1/1 del aÃ±o actual
+	    //fecha por defecto 1/1 del año actual
 	    if (!nullable){
 		ret = DateUtil.firstDayOfYear(new Date());
 	    }
@@ -376,12 +376,13 @@ public class CompetitionsBO {
     private boolean isNeedLoadStagesAndClassifications(Competition comp) {
 	boolean ret = false;
 	if (CompetitionType.STAGES.equals(comp.getCompetitionType())){
-	    if (dao.getCompetitionClassifications(comp).size()==0 || dao.getCompetitionStages(comp).size()==0){
+	    List<Competition> stagesList = dao.getCompetitionStages(comp);
+	    if (classificationsNeedReload(comp) || stagesList.size()==0){
 		ret = true;
 		log.debug("needLoad "+comp);
 	    } else if (!competitionFinalizada(comp)){
 		ret = true;
-		log.debug("needReLoad "+comp);
+		log.debug("needReLoad, not finished "+comp);
 	    } else {
 		log.debug("not load "+comp);
 	    }
@@ -390,38 +391,70 @@ public class CompetitionsBO {
 	return ret;
     }
 
-    private boolean competitionFinalizada(Competition comp) {
-	try {
-	    Calendar cal = Calendar.getInstance();
-	    cal.setTime(DateUtil.dateWithoutHour(comp.getFinishDate()));
-	    cal.add(Calendar.DAY_OF_YEAR, 1);
-	    Date finishDate = cal.getTime(); 
-	    return !finishDate.after(new Date());
-	} catch (ParseException e) {
-	    log.error("Error calculando fecha", e);
-	    return false;
+    private boolean classificationsNeedReload(Competition comp) {
+	boolean needReload = false;
+	List<Competition> classificationsList = dao.getCompetitionClassifications(comp);
+	if (classificationsList.size() == 0){
+	    needReload = true;
+	} else {
+	    for (Competition cl: classificationsList){
+		if (cl.getName().contains(Contracts.IN_PROGRESS_FLAG)){
+		    needReload = true;
+		    log.debug("needReLoad, flag 'in progress' on"+cl);
+		    break;
+		}
+	    }
 	}
+	log.debug("necesita recargar por flag in progress? "+ needReload);
+	return needReload;
+    }
+    
+    private boolean competitionFinalizada(Competition comp) {
+	boolean ret = false;
+	if (comp != null){
+	    if (comp.getFinishDate() == null){
+		log.info("fecha de fin nula, raro raro");
+	    } else {
+		try {
+		    Calendar cal = Calendar.getInstance();
+		    cal.setTime(DateUtil.dateWithoutHour(comp.getFinishDate()));
+		    cal.add(Calendar.DAY_OF_YEAR, 1);
+		    Date finishDate = cal.getTime(); 
+		    ret = !finishDate.after(new Date());
+		} catch (ParseException e) {
+		    log.error("Error calculando fecha", e);
+		}
+	    }
+	}
+	return ret;
     }
 
     private void persistClassifications(Competition stage) {
 	List<Competition> classifications = getClassifications(stage);
 	for(Competition classification : classifications){
-	    persistCompetition(classification);
 	    reloadClassificationResults(classification);
+	    persistCompetition(classification);
 	}
     }
 
     private void reloadClassificationResults(Competition classification) {
+	log.debug("init "+classification.getName());
 	Competition comp = dao.getCompetition(classification.getCompetitionID(),
 		classification.getEventID(), classification.getEditionID(),
 		classification.getGenderID(), classification.getClassID(),
 		classification.getPhase1ID(), classification.getPhaseClassificationID());
-	
-	if (!competitionFinalizada(comp) && resultsBO.tieneResultados(comp)){//recargamos los resultados
-	    resultsBO.reloadClassification(comp);
+	if (comp != null){
+	    boolean noFinalizada =!competitionFinalizada(comp) ; 
+	    boolean needReload = classificationsNeedReload(comp);
+	    log.debug("noFinalizada:"+noFinalizada);
+	    log.debug("need Reload:"+needReload);
+	    if ((noFinalizada || needReload) && resultsBO.tieneResultados(comp)){//recargamos los resultados
+		log.info("classification reload "+comp.getName());
+		resultsBO.reloadClassification(comp);
+	    }
 	}
     }
-
+    
     /**
      * 
      * @param html
