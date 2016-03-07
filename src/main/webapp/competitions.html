@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+	<!-- BOOTSTRAP -->
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+<!-- 
+ -->
+ 	<script src="js/smart-table.min.js"></script>
+	<script src="js/cyclingResultsServices.js"></script>
+	<script src="js/competitions.js"></script>
+
+</head>
+
+<body>
+   <article class="container article" id="article">
+		
+	<div class="row" ng-app="cyclingResultsApp" ng-controller="competitionsListCtrl">
+		<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+			<div class="form-group">
+				<label for="initDate">InitDate:</label>
+				<input class="form-control" id="initDate" type = "text" ng-model = "filter.initDate">
+			</div>
+			<div class="form-group">
+				<label for="finDate">FinishDate:</label>
+				 <input class="form-control" id="finDate" type = "text" ng-model = "filter.finishDate">
+			</div>
+			<div class="form-group">
+				<label for="gender">Gender:</label>
+				<select id="gender" class="form-control" ng-model="filter.genderID">
+					<option ng-repeat="g in genders" value="{{g.genderID}}">{{g.name}}</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="sport" >Sport:</label>
+				<select id="sport" class="form-control" ng-model="filter.sportID">
+					<option ng-repeat="s in sports" value="{{s.sportID}}">{{s.name}}</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="type" >Type:</label>
+				<!-- <input id="type" type = "text" ng-model = "filter.type"><br/>-->
+				<select id="type" class="form-control" ng-model="filter.type">
+			      <option ng-repeat="c in types">{{c}}</option>
+			    </select>
+			</div>
+			<div class="form-group">
+				<button ng-click="getData()">getData</button>
+			</div>
+			<table>
+				<tr ng-repeat="x in competitions">
+					 <td ng-if="$even">{{ x.initDate | date:'dd/MM/yyyy'}}</td>
+					<td ng-if="$odd" style="background-color:#f1f1f1">{{ x.initDate | date:'dd/MM/yyyy'}}</td>
+				    <td ng-if="$even">{{ x.name}}</td>
+					<td ng-if="$odd" style="background-color:#f1f1f1">{{ x.name}}</td>
+					<td ng-if="x.competitionType=='ONE_DAY'">
+						<button ng-click="getOneDayResults(x.name, x.competitionID, x.eventID, x.editionID, x.genderID, x.classID)">Resultados</button>
+					</td>
+					<td ng-if="x.competitionType=='STAGE_STAGES'">
+						<button ng-click="getStageResults(x.name, x.competitionID, x.eventID, x.editionID, x.genderID, x.classID, x.phase1ID)">Resultados</button>
+					</td>
+					<td ng-if="x.competitionType=='CLASSIFICATION_STAGES'">
+						<button ng-click="getClassification(x.name, x.competitionID, x.eventID, x.editionID, x.genderID, x.classID, x.phase1ID, x.phaseClassificationID)">Clasifica</button>
+					</td>
+					<td ng-if="x.competitionType=='STAGES'">
+						<button ng-click="getStages(x.name, x.competitionID, x.eventID, x.editionID, x.genderID, x.classID)">Detalle</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+			<h2>{{competitionName}}</h2>
+			<!-- 
+			 <table>
+				<thead>
+					<tr><th>Rank</th><th>Rider</th></tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="x in results">
+						<td ng-if="$even">{{ x.rank }}</td>
+						<td ng-if="$odd" style="background-color:#f0ffff">{{ x.rank}}</td>
+					    <td ng-if="$even">{{ x.name}}</td>
+						<td ng-if="$odd" style="background-color:#f0ffff">{{ x.name}}</td>
+						<td ng-if="$even">{{ x.team}} - {{x.nat}}</td>
+						<td ng-if="$odd" style="background-color:#f0ffff">{{ x.team}} - {{x.nat}}</td>
+					    <td ng-if="$even">{{ x.result}}</td>
+						<td ng-if="$odd" style="background-color:#f0ffff">{{ x.result}}</td>
+					</tr>
+				</tbody>
+			</table>		
+			 -->
+			
+			
+			<table st-table="results" class="table table-striped">
+				<thead>
+				<tr>
+					<th>Rank</th>
+					<th>Rider</th>
+					<th>Team</th>
+					<th>Nat</th>
+					<th>Result</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr ng-repeat="row in results">
+					<td>{{row.rank}}</td>
+					<td>{{row.name}}</td>
+					<td>{{row.team}}</td>
+					<td>{{row.nat}}</td>
+					<td>{{row.result}}</td>
+				</tr>
+				</tbody>
+			</table>
+
+						
+		</div>
+	</div>
+
+	</article>
+
+</body>
+</html>
