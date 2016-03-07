@@ -11,8 +11,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,7 @@ import an.dpr.cyclingresultsapi.util.DateUtil;
 	@UniqueConstraint(columnNames = {"competitionid" , "eventid", "editionid", "phase1id", "phaseclassificationid",
 		"classid", "genderid", "sportid"})
 	})
+@XmlRootElement
 public class Competition implements Comparable<Competition>{
 
     private static final Logger log = LoggerFactory.getLogger(Competition.class);
@@ -51,30 +53,30 @@ public class Competition implements Comparable<Competition>{
     private Long id;
     private Long eventID;
     private Long editionID;//Id de la edicion para un mismo evento (tour 2012, 2013...)
-    @JsonIgnore
+    @XmlTransient
     private Long seasonID;
     private Long competitionID;
     private Long eventPhaseID;
     private Long phaseClassificationID;//nos indica con -1 si es general 
     private Long phase1ID;//si eventphaseId = 0, y phase1id = 0, indica general.
-    @JsonIgnore
+    @XmlTransient
     private Long phase2ID;
-    @JsonIgnore
+    @XmlTransient
     private Long phase3ID;
     private Long genderID;// 1 men 2 women
     private Long classID;// elite 2 junior 101 sub23
-    @JsonIgnore
+    @XmlTransient
     private Long pageID;
-    @JsonIgnore
+    @XmlTransient
     private Long sportID;//102 road
     private String name;
     private Date initDate;
     private Date finishDate;
     private String nationality;
     private CompetitionClass competitionClass;
-    @JsonIgnore
+    @XmlTransient
     private String category;
-    @JsonIgnore
+    @XmlTransient
     private String classificationName;//TODO a eliminar
     private CompetitionType competitionType;
 
@@ -190,13 +192,13 @@ public class Competition implements Comparable<Competition>{
 	this.eventPhaseID = eventPhaseID;
     }
 
-    @JsonIgnore
+    @XmlTransient
     @Column
     public String getCategory() {
 	return category;
     }
 
-    @JsonIgnore
+    @XmlTransient
     public void setCategory(String category) {
 	this.category = category;
     }
@@ -229,46 +231,46 @@ public class Competition implements Comparable<Competition>{
         phase1ID = phase1id;
     }
 
-    @JsonIgnore
+    @XmlTransient
     @Column
     public Long getPhase2ID() {
         return phase2ID;
     }
 
-    @JsonIgnore
+    @XmlTransient
     public void setPhase2ID(Long phase2id) {
         phase2ID = phase2id;
     }
 
-    @JsonIgnore
+    @XmlTransient
     @Column
     public Long getPhase3ID() {
         return phase3ID;
     }
 
-    @JsonIgnore
+    @XmlTransient
     public void setPhase3ID(Long phase3id) {
         phase3ID = phase3id;
     }
 
-    @JsonIgnore
+    @XmlTransient
     @Column
     public Long getPageID() {
         return pageID;
     }
 
-    @JsonIgnore
+    @XmlTransient
     public void setPageID(Long pageID) {
         this.pageID = pageID;
     }
 
-    @JsonIgnore
+    @XmlTransient
     @Column
     public Long getSportID() {
         return sportID;
     }
 
-    @JsonIgnore
+    @XmlTransient
     public void setSportID(Long sportID) {
         this.sportID = sportID;
     }
@@ -282,13 +284,13 @@ public class Competition implements Comparable<Competition>{
 		+ ", competitionClass=" + competitionClass + ", competitionType=" + competitionType + "]";
     }
 
-    @JsonIgnore
+    @XmlTransient
     @Column
     public String getClassificationName() {
         return classificationName;
     }
 
-    @JsonIgnore
+    @XmlTransient
     public void setClassificationName(String classificationName) {
         this.classificationName = classificationName;
     }
@@ -310,13 +312,13 @@ public class Competition implements Comparable<Competition>{
         this.competitionType = competitionType;
     }
 
-    @JsonIgnore
+    @XmlTransient
     @Column
     public Long getSeasonID() {
         return seasonID;
     }
 
-    @JsonIgnore
+    @XmlTransient
     public void setSeasonID(Long seasonID) {
         this.seasonID = seasonID;
     }

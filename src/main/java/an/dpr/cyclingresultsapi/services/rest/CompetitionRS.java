@@ -2,6 +2,7 @@ package an.dpr.cyclingresultsapi.services.rest;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -10,10 +11,10 @@ import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import an.dpr.cyclingresultsapi.bo.CompetitionsBO;
 import an.dpr.cyclingresultsapi.domain.Competition;
+import an.dpr.cyclingresultsapi.util.Contracts;
 
 /**
  * REST service for cycling competitions
@@ -41,33 +42,34 @@ public class CompetitionRS {
     
     private static final Logger log = LoggerFactory.getLogger(CompetitionRS.class);
     
-    @Autowired
-    private CompetitionsBO bo;
+    @Inject
+    private CompetitionsBO ejb;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/query/{initDate},{finDate},{genderID},{classID},{competitionClass}")
+    @Path("/query/{initDate},{finDate},{sportID},{genderID},{classID},{competitionClass}")
     public List<Competition> getCompetitions(
 	    @PathParam("initDate") String initDate,
 	    @PathParam("finDate") String finDate,
+	    @PathParam("sportID") String sportID,
 	    @PathParam("genderID") String genderID,
 	    @PathParam("classID") String classID,
 	    @PathParam("competitionClass") String competitionClass){
-	return bo.getCompetitions(initDate, finDate, genderID, classID, competitionClass);
+	return ejb.getCompetitions(initDate, finDate, sportID, genderID, classID, competitionClass);
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/next/")
     public List<Competition> getNextCompetitions() {
-	return bo.getNextCompetitions();
+	return ejb.getNextCompetitions();
     }
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/year/{year}")
     public List<Competition> getYearCompetitions(@PathParam("year") String year) {
-	return bo.getYearCompetitions(year);
+	return ejb.getYearCompetitions(year);
     }
 
     @GET
@@ -77,14 +79,14 @@ public class CompetitionRS {
 	    @PathParam("year") String year,
 	    @PathParam("month") String month
 	    ) {
-	return bo.getMonthCompetitions(year, month);
+	return ejb.getMonthCompetitions(year, month);
     }
     
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/allEditions/{competitionID}")
     public List<Competition> getAllEditions(@PathParam("competitionID") String competitionID){
-	return bo.getAllEditions(competitionID);
+	return ejb.getAllEditions(competitionID);
     }
     
     @GET
@@ -97,7 +99,7 @@ public class CompetitionRS {
 	    @PathParam("genderID") String genderID,
 	    @PathParam("classID") String classID
 	    ) {
-	return bo.getStageRaceCompetitionsService(competitionID, eventID, editionID, genderID, classID);
+	return ejb.getStageRaceCompetitionsService(competitionID, eventID, editionID, genderID, classID);
     }
 	
 
@@ -115,7 +117,25 @@ public class CompetitionRS {
 	    @PathParam("initDate") String initDate,
 	    @PathParam("finishDate") String finishDate
 	    ) {
-	return bo.loadCompetitionsService(genderID, classID, initDate, finishDate);
+	return ejb.loadCompetitionsService(Contracts.SPORT_ID_ROAD, genderID, classID, initDate, finishDate);
+    }
+    
+    /**
+     * Last competitions finished or in course.
+     * @param initDate and finishDate in format yyyymmdd
+     * @return List<Competition>
+     */
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/loadCompetitions/{sportID},{genderID},{classID},{initDate},{finishDate}")
+    public Boolean loadCompetitionsService(
+	    @PathParam("sportID") String  sportID,
+	    @PathParam("genderID") String  genderID,
+	    @PathParam("classID") String classID,
+	    @PathParam("initDate") String initDate,
+	    @PathParam("finishDate") String finishDate
+	    ) {
+	return ejb.loadCompetitionsService(sportID, genderID, classID, initDate, finishDate);
     }
     
     /**
@@ -133,6 +153,6 @@ public class CompetitionRS {
 	    @PathParam("genderID") String  genderID,
 	    @PathParam("classID") String classID
 	    ) {
-	return bo.loadCompetitionService(competitionID, eventID, editionID, genderID, classID);
+	return ejb.loadCompetitionService(competitionID, eventID, editionID, genderID, classID);
     }
 }

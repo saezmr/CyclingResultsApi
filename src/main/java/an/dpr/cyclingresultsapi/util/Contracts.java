@@ -19,6 +19,9 @@ public interface Contracts {
     public static final String SEASON_2010="478";
     public static final String SEASON_2009="476";
     public static final String IN_PROGRESS_FLAG="progress";
+    public static final String SPORT_ID_ROAD="102";
+    public static final String SPORT_ID_CYCLOCROSS="306";
+    public static final Long DEFAULT_SPORT_ID = (long) 102;
     
     
     //KEYS DE LA UCI
@@ -60,7 +63,7 @@ public interface Contracts {
     public static final String DATE_FORMAT_SEARCH_COMPS = "yyyyMMdd";
     public static final String BASE_URL_UCI = "www.uci.infostradasports.com";
     //estan todos los datos de la historia!!!
-    public static final String ALL_COMPS = "/asp/lib/TheASP.asp?PageID=19004&TaalCode=2&StyleID=0&SportID=102&CompetitionID=-1&EditionID=-1&EventID=-1"
+    public static final String ALL_COMPS = "/asp/lib/TheASP.asp?PageID=19004&TaalCode=2&StyleID=0&SportID="+SPORT_ID+"&CompetitionID=-1&EditionID=-1&EventID=-1"
     	+ "&GenderID="+GENDER_ID+"&ClassID="+CLASS_ID
     	+ "&EventPhaseID=0&Phase1ID=0&Phase2ID=0&CompetitionCodeInv=1&PhaseStatusCode=262280&DerivedEventPhaseID=-1&SeasonID=488"
     	+ "&StartDateSort="+INIT_DATE+"&EndDateSort="+FINISH_DATE
@@ -72,11 +75,11 @@ public interface Contracts {
     public static final String URL_STAGE_EVENT_DATA="&SportID=SPORT_ID&CompetitionID=COMPETITION_ID&EditionID=EDITION_ID&EventID=EVENT_ID&GenderID=GENDER_ID&ClassID=CLASS_ID";
     public static final String URL_STAGE_DATA="&Phase1ID=PHASE1_ID";
     
-    public static final String STAGE_URL = "/asp/lib/TheASP.asp?PageID=19006&TaalCode=2&StyleID=0&SportID=102"
+    public static final String STAGE_URL = "/asp/lib/TheASP.asp?PageID=19006&TaalCode=2&StyleID=0&SportID="+SPORT_ID
 	    + "&CompetitionID="+COMPETITION_ID+"&EditionID="+EDITION_ID+"&EventID="+EVENT_ID+"&GenderID="+GENDER_ID+"&ClassID="+CLASS_ID+"&Phase1ID="+PHASE1_ID
     	+ "&PhaseClassificationID=-1&Detail=1&Ranking=0&DerivedEventPhaseID=-1&S00=1&S01=2&S02=3&PageNr0=-1&Cache=8";
     
-    public static final String CLASSIFICATIONS_URL = "/asp/lib/TheASP.asp?PageID=19006&TaalCode=2&StyleID=0&SportID=102"
+    public static final String CLASSIFICATIONS_URL = "/asp/lib/TheASP.asp?PageID=19006&TaalCode=2&StyleID=0&SportID="+SPORT_ID
     	+ "&CompetitionID="+COMPETITION_ID+"&EditionID="+EDITION_ID+"&EventID="+EVENT_ID+"&GenderID="+GENDER_ID+"&ClassID="+CLASS_ID
     	+"&PhaseClassificationID="+PHASE_CLASSIFICATION_ID+"&EventPhaseID="+EVENT_PHASE_ID
     	+ "&Phase1ID=0&Phase2ID=0&Phase3ID=0&Detail=1&Ranking=0&DerivedEventPhaseID=-1&S00=1&S01=2&S02=3&PageNr0=-1&Cache=8";

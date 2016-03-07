@@ -9,11 +9,11 @@ import an.dpr.cyclingresultsapi.domain.Competition;
 
 public interface CompetitionDAO {
 
-    List<Competition> getCompetitions(Date init, Long genderID, Long classID, CompetitionClass cc);
+    List<Competition> getCompetitions(Date init, Long sportID, Long genderID, Long classID, CompetitionClass cc);
 
-    List<Competition> getCompetitions(Date init, Date fin, Long genderID, Long classID, CompetitionClass cc);
+    List<Competition> getCompetitions(Date init, Date fin, Long sportID, Long genderID, Long classID, CompetitionClass cc);
     
-    List<Competition> getCompetitions(Date init, Date fin, Long genderID, Long classID,  CompetitionType type);
+    List<Competition> getCompetitions(Date init, Date fin, Long sportID, Long genderID, Long classID,  CompetitionType type);
 
     List<Competition> getCompetitionsBetweenDates(Date init, Date fin);
     
@@ -23,8 +23,6 @@ public interface CompetitionDAO {
 
     void delete(Long CompetitionId);
 
-    Competition findById(Long id);
-    
     /**
      * En el caso de las carreras de un dia, devuelve el competitiono unico.
      * En el caso de las carreras por etapas, devuelve el elemento principal.

@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+
 import org.apache.http.client.ClientProtocolException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -11,7 +14,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import an.dpr.cyclingresultsapi.dao.CompetitionDAO;
 import an.dpr.cyclingresultsapi.dao.ResultRowDAO;
@@ -25,18 +27,18 @@ import an.dpr.cyclingresultsapi.util.NetworkUtils;
  * 
  * @author saez
  */
+@Stateless
 public class ResultsBO {
     private static final Logger log = LoggerFactory.getLogger(ResultsBO.class);
 
-    @Autowired
+    @Inject
     private CompetitionDAO dao;
-    @Autowired
+    @Inject
     private ResultRowDAO rDao;
 
-    private static final String ROAD_MEN_SPORT_ID = "102";
     private static final String ONE_DAY_RESULTS_URL = "http://www.uci.infostradasports.com/asp/lib/TheASP.asp?PageID=19006&TaalCode=2&StyleID=0"
 	    + "&SportID="
-	    + ROAD_MEN_SPORT_ID
+	    + Contracts.SPORT_ID
 	    + "&CompetitionID="
 	    + Contracts.COMPETITION_ID
 	    + "&EditionID="
@@ -200,8 +202,11 @@ public class ResultsBO {
     
     private String getURLOneDayResults(Competition comp) {
 	String url = ONE_DAY_RESULTS_URL
+		.replace(Contracts.SPORT_ID, comp.getSportID().toString())
 		.replace(Contracts.COMPETITION_ID, comp.getCompetitionID().toString())
 		.replace(Contracts.EDITION_ID, comp.getEditionID().toString())
+		.replace(Contracts.GENDER_ID, String.valueOf(comp.getGenderID()))
+		.replace(Contracts.CLASS_ID, String.valueOf(comp.getClassID()))
 		.replace(Contracts.EVENT_PHASE_ID,
 			comp.getEventPhaseID().toString());
 	return url;
@@ -210,6 +215,8 @@ public class ResultsBO {
     private String getURLStageResults(Competition comp) {
 	StringBuilder sb = new StringBuilder();
 	sb.append(Contracts.STAGE_URL
+        		.replace(Contracts.SPORT_ID,
+        			String.valueOf(comp.getSportID()))
 			.replace(Contracts.COMPETITION_ID,
 				String.valueOf(comp.getCompetitionID()))
 			.replace(Contracts.EDITION_ID,
@@ -228,6 +235,8 @@ public class ResultsBO {
     private String getURLClassificationResults(Competition comp) {
 	StringBuilder sb = new StringBuilder();
    	sb.append(Contracts.CLASSIFICATIONS_URL
+   		.replace(Contracts.SPORT_ID,
+			String.valueOf(comp.getSportID()))
    		.replace(Contracts.COMPETITION_ID,
    			String.valueOf(comp.getCompetitionID()))
    		.replace(Contracts.EDITION_ID,

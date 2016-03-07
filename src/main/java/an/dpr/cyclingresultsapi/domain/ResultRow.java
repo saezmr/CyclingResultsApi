@@ -8,34 +8,36 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
 
 @Entity
 @Table
+@XmlRootElement
 public class ResultRow implements Comparable<ResultRow> {
 
-    @JsonProperty
+    @XmlElement
     private String rank;
-    @JsonProperty
+    @XmlElement
     private Long id;
-    @JsonProperty
+    @XmlElement
     private String name;
-    @JsonProperty
+    @XmlElement
     private String nat;
-    @JsonProperty
+    @XmlElement
     private String team;
-    @JsonProperty
+    @XmlElement
     private String age;
-    @JsonProperty
+    @XmlElement
     private String result;
-    @JsonProperty
+    @XmlElement
     private String paR;
-    @JsonProperty
+    @XmlElement
     private String pcR;
     //only for persistence
-    @JsonIgnore
+    @XmlTransient
     private Competition competition;
     
     @Id
@@ -49,13 +51,13 @@ public class ResultRow implements Comparable<ResultRow> {
 	this.id=id;
     }
     
-    @JsonIgnore
+    @XmlTransient
     @ManyToOne(fetch=FetchType.EAGER)
     public Competition getCompetition(){
 	return competition;
     }
     
-    @JsonIgnore
+    @XmlTransient
     public void setCompetition(Competition competition){
 	this.competition=competition;
     }

@@ -27,13 +27,12 @@ public class NetworkUtils {
 	try {
 	    // http://cyclingresults-dprsoft.rhcloud.com/rest/competitions/query/20140101,20140601,1,1,UWT
 	    HttpHost target = new HttpHost(baseUrl, 80, HTTP);
-	    HttpHost proxy = new HttpHost("proxy.sdc.hp.com", 8080, "http");
 
-	    RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
+	    RequestConfig config = RequestConfig.custom().build();
 	    HttpGet request = new HttpGet(get);
 	    request.setConfig(config);
 
-	    log.debug("Executing request " + request.getRequestLine() + " to " + target + " via " + proxy);
+	    log.debug("Executing request " + request.getRequestLine() + " to " + target );
 
 	    CloseableHttpResponse response = httpclient.execute(target, request);
 	    try {

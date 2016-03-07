@@ -9,7 +9,7 @@
 	
 	<!-- Beans del modelo de datos	-->
 	<bean id="competitionDAO" class="an.dpr.cyclingresultsapi.dao.springdatajpa.CompetitionDAOSDJPA"/>
-	<bean id="resultRowDAO" class="an.dpr.cyclingresultsapi.dao.springdatajpa.ResultRowDAOSDJPA"/>
+	<bean id="resultRowDAO" class="an.dpr.cyclingresultsapi.dao.mock.ResultRowDAOMock"/>
 	<bean id="competitionsBO" class="an.dpr.cyclingresultsapi.bo.CompetitionsBO"/>
 	<bean id="restulsBO" class="an.dpr.cyclingresultsapi.bo.ResultsBO"/>
 	

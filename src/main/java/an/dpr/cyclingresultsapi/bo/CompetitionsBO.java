@@ -8,6 +8,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+
 import org.apache.http.client.ClientProtocolException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,7 +18,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.bean.CompetitionType;
@@ -32,27 +34,29 @@ import an.dpr.cyclingresultsapi.util.Utils;
  * @author saez
  *
  */
+@Stateless
 public class CompetitionsBO {
 
 
     private static final Logger log = LoggerFactory.getLogger(CompetitionsBO.class);
     
-    @Autowired
+    @Inject
     private CompetitionDAO dao;
-    @Autowired
+    @Inject
     private ResultsBO resultsBO;
 
-    public List<Competition> getCompetitions(String initDate,String finDate,String genderID,String classID,String competitionClass){
+    public List<Competition> getCompetitions(String initDate,String finDate,String sportID, String genderID,String classID,String competitionClass){
 	List<Competition> list = null;
 	try {
 	    Date id = getDate(initDate, false);
 	    Date fd = getDate(finDate, true);
 	    if (fd == null){
-		list = dao.getCompetitions(id, getGenderID(genderID), getClassID(classID), getCompetitionClass(competitionClass));
+		list = dao.getCompetitions(id, getSportID(sportID), getGenderID(genderID), getClassID(classID), getCompetitionClass(competitionClass));
 	    } else {
-		list = dao.getCompetitions(id, fd, getGenderID(genderID), getClassID(classID), getCompetitionClass(competitionClass));
+		list = dao.getCompetitions(id, fd, getSportID(sportID), getGenderID(genderID), getClassID(classID), getCompetitionClass(competitionClass));
 	    }
-	    Collections.sort(list);
+	    if(list != null)
+		Collections.sort(list);
 	} catch (ParseException e) {
 	    log.error("Error obteniendo competiciones", e);
 	}
@@ -67,6 +71,14 @@ public class CompetitionsBO {
 	return ret;
     }
 
+    private Long getSportID(String sportID) {
+	try{
+	    return Long.parseLong(sportID);
+	} catch(NumberFormatException e){
+	    return Contracts.DEFAULT_SPORT_ID;
+	}
+    }
+    
     private Long getClassID(String classID) {
 	try{
 	    return Long.parseLong(classID);
@@ -86,7 +98,7 @@ public class CompetitionsBO {
     private Date getDate(String cadena, boolean nullable) throws ParseException {
 	Date ret = null;
 	if (cadena == null || cadena.isEmpty()) {
-	    //fecha por defecto 1/1 del año actual
+	    //fecha por defecto 1/1 del aÃ±o actual
 	    if (!nullable){
 		ret = DateUtil.firstDayOfYear(new Date());
 	    }
@@ -248,6 +260,8 @@ public class CompetitionsBO {
     private String getURLClassifications(Competition comp) {
    	StringBuilder sb = new StringBuilder();
    	sb.append(Contracts.CLASSIFICATIONS_URL
+   		.replace(Contracts.SPORT_ID,
+			String.valueOf(comp.getSportID()))
    		.replace(Contracts.COMPETITION_ID,
    			String.valueOf(comp.getCompetitionID()))
    		.replace(Contracts.EDITION_ID,
@@ -272,6 +286,7 @@ public class CompetitionsBO {
      * @return List<Competition>
      */
     public Boolean loadCompetitionsService(
+	    String sportID, 
 	    String  genderID,
 	    String classID,
 	    String initDate,
@@ -279,23 +294,26 @@ public class CompetitionsBO {
 	    ) {
 	Boolean ret;
 	try{
+	    if (sportID == null || sportID.isEmpty()){
+		sportID = Contracts.SPORT_ID_ROAD;
+	    }
 	    if ((genderID != null && !genderID.isEmpty()) && (classID != null && !classID.isEmpty())){
-		loadCompetitions(genderID, classID, initDate, finishDate);
+		loadCompetitions(sportID, genderID, classID, initDate, finishDate);
 		log.info("competiciones genderID="+genderID+", classID="+classID+" cargadas con exito");
 		ret = Boolean.TRUE;
 	    } else if ((genderID == null || genderID.isEmpty()) && (classID == null || classID.isEmpty())){
-		loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.ELITE_CLASS_ID, initDate, finishDate);
-		loadCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.ELITE_CLASS_ID, initDate, finishDate);
-		loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.UNDER23_CLASS_ID, initDate, finishDate);
-		loadCompetitions(Contracts.MEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID, initDate, finishDate);
-		loadCompetitions(Contracts.WOMEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID, initDate, finishDate);
+		loadCompetitions(sportID,Contracts.MEN_GENDER_ID, Contracts.ELITE_CLASS_ID, initDate, finishDate);
+		loadCompetitions(sportID,Contracts.WOMEN_GENDER_ID, Contracts.ELITE_CLASS_ID, initDate, finishDate);
+		loadCompetitions(sportID,Contracts.MEN_GENDER_ID, Contracts.UNDER23_CLASS_ID, initDate, finishDate);
+		loadCompetitions(sportID,Contracts.MEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID, initDate, finishDate);
+		loadCompetitions(sportID,Contracts.WOMEN_GENDER_ID, Contracts.JUNIOR_CLASS_ID, initDate, finishDate);
 		ret = Boolean.TRUE;
 	    } else {
 		ret = Boolean.FALSE;
 	    }
 	    if (ret){
 		//ahora cargaremos todas las "stage competitions" o clasificaicones internas de una prueba
-		loadAndSaveStageCompetitions(genderID, classID, initDate, finishDate);
+		loadAndSaveStageCompetitions(sportID, genderID, classID, initDate, finishDate);
 	    }
 	    log.info("competitions load is finished "+genderID+","+classID+","+initDate+","+finishDate);
 	} catch(Exception e){
@@ -336,12 +354,12 @@ public class CompetitionsBO {
     
     /*
      */
-    private void loadAndSaveStageCompetitions(String genderID, String classID, String initDate, String finishDate) throws ParseException, CyclingResultsException {
+    private void loadAndSaveStageCompetitions(String sportID, String genderID, String classID, String initDate, String finishDate) throws ParseException, CyclingResultsException {
 	Date init = DateUtil.parse(initDate, Contracts.DATE_FORMAT_SEARCH_COMPS);
 	Calendar cal = Calendar.getInstance();
 	cal.setTime(DateUtil.parse(finishDate, Contracts.DATE_FORMAT_SEARCH_COMPS));
 	Date fin = cal.getTime(); 
-	List<Competition> competitions = dao.getCompetitions(init, fin,Long.parseLong(genderID), Long.parseLong(classID), CompetitionType.STAGES);
+	List<Competition> competitions = dao.getCompetitions(init, fin,Long.parseLong(sportID), Long.parseLong(genderID), Long.parseLong(classID), CompetitionType.STAGES);
 	for (Competition comp : competitions) {
 	    if(isNeedLoadStagesAndClassifications(comp)){
 		log.info("la competicion "+comp.getName()+" no esta cargada o finalizada, cargamos info");
@@ -505,10 +523,10 @@ public class CompetitionsBO {
 	return ret;
     }
 
-    private void loadCompetitions(String genderID, String classID, String initDate, String finishDate) {
+    private void loadCompetitions(String sportID, String genderID, String classID, String initDate, String finishDate) {
 	String htmlString = null;
 	try {
-	    String url = getURLCompetitions(genderID, classID, initDate, finishDate);
+	    String url = getURLCompetitions(sportID, genderID, classID, initDate, finishDate);
 	    htmlString = NetworkUtils.getRequest(Contracts.BASE_URL_UCI, url);
 	} catch (ClientProtocolException e) {
 	    log.error("error leyendo info ", e);
@@ -524,8 +542,9 @@ public class CompetitionsBO {
 	}
     }
     
-    private String getURLCompetitions(String genderID, String classID, String initDate, String finishDate) {
+    private String getURLCompetitions(String sportID, String genderID, String classID, String initDate, String finishDate) {
 	String url = Contracts.ALL_COMPS
+		.replace(Contracts.SPORT_ID, sportID)
 		.replace(Contracts.GENDER_ID, genderID)
 		.replace(Contracts.CLASS_ID, classID)
 		.replace(Contracts.INIT_DATE, initDate)
@@ -549,31 +568,33 @@ public class CompetitionsBO {
 	    if (row.attr("valign").equals("top")) {// los que no tienen
 						   // valing=top son headers
 		Elements rowItems = row.select("td");
-		Competition competition = new Competition.Builder()
-			.setEventID(getKeyId(rowItems.get(1).toString(),Contracts.EVENT_ID_KEY))
-			.setSeasonID(getKeyId(rowItems.get(1).toString(),Contracts.SEASON_ID_KEY))
-			.setCompetitionID(getKeyId(rowItems.get(1).toString(),Contracts.COMPETITION_ID_KEY))
-			.setEventPhaseID(getKeyId(rowItems.get(1).toString(), Contracts.EVENT_PHASE_ID_KEY))
-			.setPhaseClassificationID(getKeyId(rowItems.get(1).toString(), Contracts.PHASE_CLASSIFICATION_ID_KEY))
-			.setEditionID(getKeyId(rowItems.get(1).toString(), Contracts.EDITION_ID_KEY))
-			.setGenderID(getKeyId(rowItems.get(1).toString(), Contracts.GENDER_ID_KEY))
-			.setClassID(getKeyId(rowItems.get(1).toString(), Contracts.CLASS_ID_KEY))
-			.setPageID(getKeyId(rowItems.get(1).toString(), Contracts.PAGE_ID_KEY))
-			.setSportID(getKeyId(rowItems.get(1).toString(), Contracts.SPORT_ID_KEY))
-			.setPhase1ID(getKeyId(rowItems.get(1).toString(), Contracts.PHASE1_ID_KEY))
-			.setPhase2ID(getKeyId(rowItems.get(1).toString(), Contracts.PHASE2_ID_KEY))
-			.setPhase3ID(getKeyId(rowItems.get(1).toString(), Contracts.PHASE3_ID_KEY))
-			
-			.setDates(
-				rowItems.get(0).text().replace("\u00a0", "")
-					.trim())
-			.setName(rowItems.get(1).text())
-			.setNationality(rowItems.get(2).text())	
-			.setCompetitionClass(CompetitionClass.get(rowItems.get(3).text())).build();
-		competition.calculateCompetitionType();
-		log.debug(competition.toString());
-		persistCompetition(competition);
-		list.add(competition);
+		if(rowItems.size()>1){
+		    Competition competition = new Competition.Builder()
+		    .setEventID(getKeyId(rowItems.get(1).toString(),Contracts.EVENT_ID_KEY))
+		    .setSeasonID(getKeyId(rowItems.get(1).toString(),Contracts.SEASON_ID_KEY))
+		    .setCompetitionID(getKeyId(rowItems.get(1).toString(),Contracts.COMPETITION_ID_KEY))
+		    .setEventPhaseID(getKeyId(rowItems.get(1).toString(), Contracts.EVENT_PHASE_ID_KEY))
+		    .setPhaseClassificationID(getKeyId(rowItems.get(1).toString(), Contracts.PHASE_CLASSIFICATION_ID_KEY))
+		    .setEditionID(getKeyId(rowItems.get(1).toString(), Contracts.EDITION_ID_KEY))
+		    .setGenderID(getKeyId(rowItems.get(1).toString(), Contracts.GENDER_ID_KEY))
+		    .setClassID(getKeyId(rowItems.get(1).toString(), Contracts.CLASS_ID_KEY))
+		    .setPageID(getKeyId(rowItems.get(1).toString(), Contracts.PAGE_ID_KEY))
+		    .setSportID(getKeyId(rowItems.get(1).toString(), Contracts.SPORT_ID_KEY))
+		    .setPhase1ID(getKeyId(rowItems.get(1).toString(), Contracts.PHASE1_ID_KEY))
+		    .setPhase2ID(getKeyId(rowItems.get(1).toString(), Contracts.PHASE2_ID_KEY))
+		    .setPhase3ID(getKeyId(rowItems.get(1).toString(), Contracts.PHASE3_ID_KEY))
+		    
+		    .setDates(
+			    rowItems.get(0).text().replace("\u00a0", "")
+			    .trim())
+			    .setName(rowItems.get(1).text())
+			    .setNationality(rowItems.get(2).text())	
+			    .setCompetitionClass(CompetitionClass.get(rowItems.get(3).text())).build();
+		    competition.calculateCompetitionType();
+		    log.debug(competition.toString());
+		    persistCompetition(competition);
+		    list.add(competition);
+		}
 	    }
 	}
 	return list;

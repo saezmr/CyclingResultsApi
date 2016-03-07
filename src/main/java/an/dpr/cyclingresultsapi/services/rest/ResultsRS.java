@@ -2,6 +2,7 @@ package an.dpr.cyclingresultsapi.services.rest;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -10,7 +11,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import an.dpr.cyclingresultsapi.bo.ResultsBO;
 import an.dpr.cyclingresultsapi.domain.ResultRow;
@@ -36,8 +36,8 @@ import an.dpr.cyclingresultsapi.domain.ResultRow;
 public class ResultsRS {
     private static final Logger log = LoggerFactory.getLogger(ResultsRS.class);
 
-    @Autowired
-    private ResultsBO bo;
+    @Inject
+    private ResultsBO ejb;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -49,7 +49,7 @@ public class ResultsRS {
 	    @PathParam("genderID") String genderID,
 	    @PathParam("classID") String classID
 	    ) {
-	return bo.getOneDayResult(competitionID, eventID, editionID, genderID, classID);
+	return ejb.getOneDayResult(competitionID, eventID, editionID, genderID, classID);
     }
 
     @GET
@@ -62,7 +62,7 @@ public class ResultsRS {
 	    @PathParam("genderID") String genderID,
 	    @PathParam("classID") String classID,
 	    @PathParam("phase1ID") String phase1ID) {
-	return bo.getStageResult(competitionID, eventID, editionID, genderID, classID, phase1ID);
+	return ejb.getStageResult(competitionID, eventID, editionID, genderID, classID, phase1ID);
     }
     
     @GET
@@ -77,7 +77,7 @@ public class ResultsRS {
 	    @PathParam("phase1ID") String phase1ID,
 	    @PathParam("phaseClassificationID") String phaseClassificationID
 	    ) {
-	return bo.getClassificationResult(competitionID, eventID, editionID, genderID, classID, phase1ID, phaseClassificationID);
+	return ejb.getClassificationResult(competitionID, eventID, editionID, genderID, classID, phase1ID, phaseClassificationID);
     }
     
 }
