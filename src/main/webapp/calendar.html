@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<script
+	src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+	<!-- BOOTSTRAP -->
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+<!-- 
+ -->
+ 	<script src="js/smart-table.min.js"></script>
+	<script src="js/cyclingResultsServices.js"></script>
+	<script src="js/calendarController.js"></script>
+
+</head>
+
+<body>
+   <article class="container article" id="article" ng-app="calendarApp" >
+	<div class="row" ng-controller="calendarCtrl">
+		<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" >
+			<div class="form-group">
+				<label for="initDate">InitDate:</label>
+				<input class="form-control" id="initDate" type = "text" ng-model = "filter.initdate">
+			</div>
+			<div class="form-group">
+				<label for="finDate">FinishDate:</label>
+				 <input class="form-control" id="finDate" type = "text" ng-model = "filter.finishdate">
+			</div>
+			<div class="form-group">
+				<label for="name">name:</label>
+				 <input class="form-control" id="name" type = "text" ng-model = "filter.name">
+			</div>
+			<div class="form-group">
+				<label for="country">country:</label>
+				 <input class="form-control" id="country" type = "text" ng-model = "filter.country">
+			</div>
+			<div class="form-group">
+				<label for="category">category:</label>
+				 <input class="form-control" id="category" type = "text" ng-model = "filter.category">
+			</div>
+			<div class="form-group">
+				<label for="eventClass">eventClass:</label>
+				 <input class="form-control" id="eventClass" type = "text" ng-model = "filter.eventClass">
+			</div>
+			<div class="form-group">
+				<button ng-click="getCalendar()">getCalendar</button>
+			</div>
+		</div>
+		<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" >
+			<table st-table="results" class="table table-striped">
+				<thead>
+				<tr>
+					<th>Init</th>
+					<th>Fin</th>
+					<th>Name</th>
+					<th>Country</th>
+					<th>Category</th>
+					<th>Class</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr ng-repeat="row in results">
+					<td>{{row.initDate | date:'dd/MM/yyyy'}}</td>
+					<td>{{row.finishDate | date:'dd/MM/yyyy'}}</td>
+					<td>{{row.name}}</td>
+					<td>{{row.country}}</td>
+					<td>{{row.category}}</td>
+					<td>{{row.eventClass}}</td>
+				</tr>
+				</tbody>
+			</table>
+
+						
+		</div>
+	</div>
+
+	</article>
+
+</body>
+</html>

@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 @Table(uniqueConstraints={
-		@UniqueConstraint(columnNames={"rank", "name", "paR", "competition"})
+		@UniqueConstraint(columnNames={"rank", "name", "paR", "competition_id"})
 		})
 @XmlRootElement
 public class ResultRow implements Comparable<ResultRow> {

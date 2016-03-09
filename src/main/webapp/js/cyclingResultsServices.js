@@ -59,7 +59,10 @@ angular.module('cyclingResultsServices', [])
 	var loadCompetitions = function(sportID, genderID, classID, initDate, finishDate) {
 		return $http.get("rest/competitions/loadCompetitions/"+sportID+","+genderID+","+classID+","+initDate+","+finishDate);
 	}
-	
+
+	var getCalendar = function(initdate, finishdate, name, country, category, eventClass) {
+		return $http.get("rest/calendar/query/"+initdate+","+finishdate+","+name+","+country+","+category+","+eventClass);
+	}
 	
 	
 	
@@ -69,6 +72,7 @@ angular.module('cyclingResultsServices', [])
 		getStages:getStages,
 		getStageResults:getStageResults,
 		getClassification: getClassification, 
-		loadCompetitions: loadCompetitions
+		loadCompetitions: loadCompetitions,
+		getCalendar: getCalendar
 	}
 }]);
