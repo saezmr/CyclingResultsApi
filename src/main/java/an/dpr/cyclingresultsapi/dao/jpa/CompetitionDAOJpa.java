@@ -17,12 +17,11 @@ import org.slf4j.Logger;
 
 import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.bean.CompetitionType;
-import an.dpr.cyclingresultsapi.dao.AbstractDao;
 import an.dpr.cyclingresultsapi.dao.CompetitionDAO;
 import an.dpr.cyclingresultsapi.domain.Competition;
 import an.dpr.cyclingresultsapi.domain.Competition_;
 
-public class CompetitionDAOJpa extends AbstractDao<Competition> implements CompetitionDAO  {
+public class CompetitionDAOJpa extends AbstractDaoJpa<Competition> implements CompetitionDAO  {
     
     public CompetitionDAOJpa() {
 	super(Competition.class);
@@ -263,9 +262,23 @@ public class CompetitionDAOJpa extends AbstractDao<Competition> implements Compe
     }
 
     @Override
-    public List<Competition> getCompetitionAllEditions(long parseLong) {
-	// TODO Auto-generated method stub
-	return null;
+    public List<Competition> getCompetitionAllEditions(long competitionID) {
+	List<Competition> list = null;
+	CriteriaBuilder cb = em.getCriteriaBuilder();
+	CriteriaQuery<Competition> query = cb.createQuery(Competition.class);
+	Root<Competition> from = query.from(Competition.class);
+	
+	query.select(from);
+	Predicate[] andPredicates = {
+		cb.equal(from.<Long>get(Competition_.competitionID), competitionID),
+	};
+	query.where(cb.and(andPredicates));
+	Order order = cb.desc(from.get(Competition_.initDate));
+	query.orderBy(order);
+	TypedQuery<Competition> tq = em.createQuery(query);
+	list = tq.getResultList();
+	
+	return list;
     }
 
     @Override

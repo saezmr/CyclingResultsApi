@@ -3,11 +3,13 @@
  */
 
 var app = angular.module('cyclingResultsApp', ['cyclingResultsServices'])
-.controller('competitionsListCtrl', ['$scope', '$filter', '$http', 'contracts', 'restServices',
-   function($scope, $filter, $http, contracts,restServices) {
+.controller('competitionsListCtrl', ['$scope', '$filter', '$http', '$window', 'contracts', 'restServices',
+   function($scope, $filter, $http, $window, contracts,restServices) {
+	$scope.verFiltro = true;
 	$scope.types = contracts.competitionClassesCmb();
 	$scope.genders =contracts.genderCmb();
 	$scope.sports = contracts.sportCmb();
+	$scope.classes = contracts.classCmb();
 	$scope.competitionName = "-"
 	$scope.results = [ {
 		rank : "-",
@@ -22,24 +24,26 @@ var app = angular.module('cyclingResultsApp', ['cyclingResultsServices'])
 	$scope.filter = {
 		sportID : "102",
 		genderID : "1",
+		classID: "1",
 		initDate : initDate,
 		finishDate : finishDate,
-		type : "UWT"
+		type : "UWT",
+		verKatapin: "true"
 	}
 	var filter = $scope.filter;
-	$http.get(
-			"rest/competitions/query/" + filter.initDate + ","
-					+ filter.finishDate + "," + filter.sportID + ","
-					+ filter.genderID + ",1," + filter.type).then(
-			function(response) {
-				$scope.competitions = response.data;
-			});
+	
+	$scope.loadCompetitions = function() { 
+		restServices.loadCompetitions(filter.sportID, filter.genderID, filter.classID, filter.initDate, filter.finishDate)
+		.then(function(response){
+			$window.alert("resultado carga:"+response.data);
+		});
+	}
+	
 	$scope.getData = function() {
-		$http.get(
-				"rest/competitions/query/" + filter.initDate + ","
-						+ filter.finishDate + "," + filter.sportID + ","
-						+ filter.genderID + ",1," + filter.type).then(
+		restServices.getCompetitions(filter.initDate, filter.finishDate, 
+				filter.sportID, filter.genderID, filter.classID, filter.type).then(
 				function(response) {
+					showCompetitions();
 					$scope.competitions = response.data;
 				});
 	}
@@ -47,12 +51,11 @@ var app = angular.module('cyclingResultsApp', ['cyclingResultsServices'])
 	$scope.getStages = function(competitionName, competitionID, eventID,
 			editionID, genderID, classID) {
 		$scope.competitionName = competitionName;
-		$http.get(
-				"rest/competitions/stageRaceCompetitions/" + competitionID
-						+ "," + eventID + "," + editionID + "," + genderID
-						+ "," + classID).then(function(response) {
-			$scope.competitions = response.data;
-		});
+		restServices.getStages(competitionID, eventID ,editionID ,genderID, classID)
+		.then(function(response) {
+				showCompetitions();
+				$scope.competitions = response.data;
+			});
 	}
 
 	$scope.getOneDayResults = function(competitionName, competitionID, eventID,
@@ -62,10 +65,11 @@ var app = angular.module('cyclingResultsApp', ['cyclingResultsServices'])
 			rank : "...",
 			name : "loading..."
 		} ]
-		$scope.results = restServices.getOneDayResults(competitionID, eventID, editionID, genderID, classID)
+		restServices.getOneDayResults(competitionID, eventID, editionID, genderID, classID)
 			.then(
 				function(response) {
 					$scope.results = response.data;
+					showResults();
 				});
 	}
 
@@ -76,12 +80,11 @@ var app = angular.module('cyclingResultsApp', ['cyclingResultsServices'])
 			rank : "...",
 			name : "loading..."
 		} ]
-		$http.get(
-				"rest/results/stage/" + competitionID + "," + eventID + ","
-						+ editionID + "," + genderID + "," + classID + ","
-						+ phase1ID).then(function(response) {
-			$scope.results = response.data;
-		});
+		restServices.getStageResults(competitionID, eventID,editionID,genderID,classID,phase1ID)
+			.then(function(response) {
+				$scope.results = response.data;
+				showResults();
+			});
 	}
 
 	$scope.getClassification = function(competitionName, competitionID,
@@ -92,12 +95,40 @@ var app = angular.module('cyclingResultsApp', ['cyclingResultsServices'])
 			rank : "...",
 			name : "loading..."
 		} ]
-		$http.get(
-				"rest/results/classification/" + competitionID + "," + eventID
-						+ "," + editionID + "," + genderID + "," + classID
-						+ "," + phase1ID + "," + phaseClassificationID).then(
+		restServices.getClassification(competitionID,eventID,editionID,genderID,classID,
+				phase1ID,phaseClassificationID).then(
 				function(response) {
 					$scope.results = response.data;
+					showResults();
 				});
 	}
+	
+	
+	function showResults () {
+		$scope.verFiltro = false;
+		$scope.verCompetis = false;
+		$scope.verResults = true;
+	}
+	
+	function showCompetitions() {
+		$scope.verCompetis = true;
+		$scope.verResults = false;
+		$scope.verFiltro = false;
+	}
+	
+	$scope.showResults = function(){
+		showResults();
+	}
+	
+	$scope.showCompetitions = function(){
+		showCompetitions();
+	}
+	
+	$scope.showForm = function() {
+		$scope.verFiltro = true;
+		$scope.verCompetis = false;
+		$scope.verResults = false;
+	}
+	
+	
 }]);

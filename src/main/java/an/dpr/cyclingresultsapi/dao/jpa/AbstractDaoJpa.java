@@ -1,4 +1,4 @@
-package an.dpr.cyclingresultsapi.dao;
+package an.dpr.cyclingresultsapi.dao.jpa;
 
 import java.util.Iterator;
 import java.util.List;
@@ -12,11 +12,11 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-public abstract class AbstractDao<T> {
+public abstract class AbstractDaoJpa<T> {
 
     private final Class<T> entityClass;
 
-    public AbstractDao(Class<T> entityClass) {
+    public AbstractDaoJpa(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 

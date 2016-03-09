@@ -8,19 +8,23 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.slf4j.Logger;
 
 import an.dpr.cyclingresultsapi.cdi.interceptor.Logged;
-import an.dpr.cyclingresultsapi.dao.AbstractDao;
+import an.dpr.cyclingresultsapi.dao.CompetitionDAO;
 import an.dpr.cyclingresultsapi.dao.ResultRowDAO;
 import an.dpr.cyclingresultsapi.domain.Competition;
+import an.dpr.cyclingresultsapi.domain.Competition_;
 import an.dpr.cyclingresultsapi.domain.ResultRow;
 import an.dpr.cyclingresultsapi.domain.ResultRow_;
 
 @Logged
-public class ResultRowDAOJpa extends AbstractDao<ResultRow> implements ResultRowDAO{
+public class ResultRowDAOJpa extends AbstractDaoJpa<ResultRow> implements ResultRowDAO{
+    
+    @Inject private CompetitionDAO competitionDao;
     
     public ResultRowDAOJpa() {
 	super(ResultRow.class);
@@ -57,25 +61,27 @@ public class ResultRowDAOJpa extends AbstractDao<ResultRow> implements ResultRow
 
     @Override
     public boolean competitionResultsExists(Competition competition) {
-	// TODO Auto-generated method stub
-	log.error("Por implementar!!");
-	return false;
+	List<ResultRow> list = getResults(competition);
+	return list.size()>0;
     }
 
     @Override
     public boolean resultRowExists(ResultRow rr) {
-	// TODO Auto-generated method stub
-	log.error("Por implementar!!");
-	return false;
+	//TODO MODIFICAR ESTO, rank no es PK, puede haber varios DNF, DQS...
+	//ResultRow result = repo.findByRankAndCompetition(rr.getRank(), rr.getCompetition());
+	return false;//result != null;
     }
 
     @Override
     public void deleteCompetitionRows(Competition comp) {
-	// TODO Auto-generated method stub
-	log.error("Por implementar!!");
-	
+	//primero buscamos la row  para tener el id
+	Competition findCompetition = competitionDao.getCompetition(
+		comp.getCompetitionID(), comp.getEventID(), comp.getEditionID(), comp.getGenderID(),
+		comp.getClassID(), comp.getPhase1ID(), comp.getPhaseClassificationID());
+	//luego borramos todos los resultrow con ese id
+	deleteCompetitionRows(findCompetition);
     }
-
+   
     @Override
     protected EntityManager getEntityManager() {
 	return em;

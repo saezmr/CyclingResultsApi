@@ -405,4 +405,8 @@ public class DateUtil {
 	    return null;
 	}
     }
+    
+    public static int getCurrentYear(){
+	return Calendar.getInstance().get(Calendar.YEAR);
+    }
 }

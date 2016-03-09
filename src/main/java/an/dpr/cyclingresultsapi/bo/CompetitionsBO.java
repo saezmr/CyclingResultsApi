@@ -2,11 +2,13 @@ package an.dpr.cyclingresultsapi.bo;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.bean.CompetitionType;
 import an.dpr.cyclingresultsapi.dao.CompetitionDAO;
+import an.dpr.cyclingresultsapi.domain.CalendarEvent;
 import an.dpr.cyclingresultsapi.domain.Competition;
 import an.dpr.cyclingresultsapi.exception.CyclingResultsException;
 import an.dpr.cyclingresultsapi.util.Contracts;
@@ -221,6 +224,7 @@ public class CompetitionsBO {
 	
 	return sb.toString();
     }
+ 
 
     private List<Competition> tratarXmlStageRaceCompetitions(String html, Competition competition) {
 	Document doc = Jsoup.parse(html);

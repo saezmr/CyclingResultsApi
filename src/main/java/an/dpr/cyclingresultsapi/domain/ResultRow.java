@@ -8,13 +8,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 
 @Entity
-@Table
+@Table(uniqueConstraints={
+		@UniqueConstraint(columnNames={"rank", "name", "paR", "competition"})
+		})
 @XmlRootElement
 public class ResultRow implements Comparable<ResultRow> {
 

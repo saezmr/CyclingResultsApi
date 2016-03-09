@@ -3,9 +3,17 @@ package an.dpr.cyclingresultsapi.dao;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 import an.dpr.cyclingresultsapi.bean.CompetitionClass;
 import an.dpr.cyclingresultsapi.bean.CompetitionType;
 import an.dpr.cyclingresultsapi.domain.Competition;
+import an.dpr.cyclingresultsapi.domain.Competition_;
+import an.dpr.cyclingresultsapi.domain.ResultRow;
 
 public interface CompetitionDAO {
 
@@ -62,5 +70,4 @@ public interface CompetitionDAO {
 
     List<Competition> getCompetitionAllEditions(long parseLong);
 
-    
 }
